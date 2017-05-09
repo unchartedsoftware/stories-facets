@@ -36,7 +36,7 @@ A full list of interactive examples can be [found here](./examples)
 
 ## Installation
 
-The Facets Widget is available via [NPM](https://www.npmjs.com/package/uncharted-facets).
+The Facets Widget is available via [NPM](https://www.npmjs.com/package/@uncharted.software/stories-facets).
 
 To use it as a JSPM dependency, first install JSPM:
 
@@ -44,11 +44,11 @@ To use it as a JSPM dependency, first install JSPM:
 
 Now you can install it in your project:
 
-	jspm install npm:uncharted-facets
+	jspm install stories-facets=npm:@uncharted.software/stories-facets
 
 To consume it in your project, use:
 
-    import Facets from 'uncharted-facets';
+    import Facets from 'stories-facets';
 
 
 ## Development
@@ -65,13 +65,13 @@ To install all dependencies and start a Gulp watch:
 
 Facets auto-links via JSPM on build/watch. This means you can use your local linked copy in other projects for quick iteration. To do so, run the following in your project that requires Facets:
 
-    jspm install --link npm:uncharted-facets
+    jspm install --link npm:@uncharted.software/stories-facets
 
 This will connect that project to your local development version of facets. Be aware that this is version sensitive so if your local version of facets doesn't match the version being consumed by your project this may not have the desired effect.
 
 To unlink the project and go back to the version from npm, run:
 
-    jspm install --unlink npm:uncharted-facets
+    jspm install --unlink npm:@uncharted.software/stories-facets
 
 
 ## Run tests
