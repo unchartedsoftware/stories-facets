@@ -72,9 +72,8 @@
     ]
   },
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp deploy && gulp test"
   },
   "dependencies": {
-    "sinon": "^2.1.0"
   }
 }
