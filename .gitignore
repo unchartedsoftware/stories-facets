@@ -1,0 +1,66 @@
+# ----------------------------------------
+# IntelliJ Gitignore
+# ----------------------------------------
+
+# User-specific stuff:
+.idea
+
+# File-based project format:
+.ipr
+.iws
+*.iml
+
+# IntelliJ
+/out/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# ----------------------------------------
+## OS Specific Gitignore
+# ----------------------------------------
+
+# OS X
+.DS_Store*
+Icon?
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+*~
+
+# npm
+node_modules
+*.log
+*.gz
+
+
+# ----------------------------------------
+## App Specific
+# ----------------------------------------
+
+public/facets.css
+public/facets.min.css
+public/facets.js
+public/facets.min.js
+config.js
+!public/javascripts/config.js
+**/templates/*.js
+dist/**
+**/extern.js
+**/extern.css
+!**/extern/fonts/
+!**/extern/css/
+.vagrant/
+
+# ----------------------------------------
+## Test Reports
+# ----------------------------------------
+
+coverage/**
+bamboo/**

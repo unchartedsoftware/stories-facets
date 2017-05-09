@@ -1,0 +1,11 @@
+.idea/
+extern
+examples
+node_modules
+tests/
+.editorconfig
+.gitignore
+.npmrc
+gulpfile.js
+karma.conf.js
+.npmignore
