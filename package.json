@@ -2,10 +2,10 @@
   "name": "@uncharted.software/stories-facets",
   "main": "dist/facets.js",
   "description": "Facets Component developed by Uncharted Software",
-  "repository" : "https://github.com/unchartedsoftware/stories-facets",
+  "repository": "https://github.com/unchartedsoftware/stories-facets",
   "license": "Apache-2.0",
   "version": "2.4.23",
-    "devDependencies": {
+  "devDependencies": {
     "body-parser": "~1.13.2",
     "browserify": "^12.0.1",
     "browserify-istanbul": "^0.2.1",
@@ -45,7 +45,7 @@
     "run-sequence": "1.1.4",
     "serve-favicon": "~2.3.0",
     "shelljs": "^0.6.0",
-    "sinon": "^1.17.2",
+    "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "vinyl-buffer": "1.0.0",
     "vinyl-source-stream": "1.1.0",
@@ -74,5 +74,7 @@
   "scripts": {
     "test": "gulp test"
   },
-  "dependencies": {}
+  "dependencies": {
+    "sinon": "^2.1.0"
+  }
 }
