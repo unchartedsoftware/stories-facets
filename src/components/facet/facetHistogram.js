@@ -33,6 +33,7 @@ function FacetHistogram (svgContainer, spec) {
 	this._maxBarWidth = ('maxBarWidth' in spec) ? spec.maxBarWidth : Number.MAX_VALUE;
 	this._barPadding = ('barPadding' in spec) ? spec.barPadding : 1;
 	this._bars = [];
+	this._maxBarHeight = 0;
 
 	this.initializeSlices(svgContainer, spec.slices);
 }
@@ -145,6 +146,7 @@ FacetHistogram.prototype.initializeSlices = function(svg, slices) {
 	}
 
 	this._totalWidth = x - barPadding;
+	this._maxBarHeight = yMax;
 };
 
 /**
@@ -196,7 +198,7 @@ FacetHistogram.prototype.highlightRange = function (range) {
  */
 FacetHistogram.prototype.select = function (slices) {
 	var bars = this._bars;
-	var yMax = this._spec.yMax;
+	var yMax = this._maxBarHeight;
 	var svgHeight = this._svg.height();
 
 	for (var i = 0, n = bars.length; i < n; ++i) {
