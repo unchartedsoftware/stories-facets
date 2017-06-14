@@ -513,3 +513,7 @@
 	height: 0;
 	opacity: 0;
 }
+
+.facets-no-transition *{
+	transition: none !important;
+}
