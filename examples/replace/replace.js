@@ -56,7 +56,7 @@ function main() {
 		            ]
 		        }
 			];
-            f.replace(newGroups, newQueries);
+            f.replace(newGroups, newQueries, true); //disables CSS animations during replace
         })
         .appendTo($controls);
 
