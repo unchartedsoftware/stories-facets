@@ -17,12 +17,14 @@ function SelectionGroup(container) {
   this._container = container;
   this._container.append(this._element);
 
+  this._badgeContainer = this._container.find('.facets-selection-group-badges');
+
   Handlebars.registerPartial('selectionGroup_badge', selectionGroup_badge);
 }
 
 SelectionGroup.prototype._add = function (k, v) {
   var badgeSpec = {key: k, value: v};
-  this._selections.push(badgeSpec); //TODO: don't allow adding duplicates
+  this._selections.push(badgeSpec); //TODO: Shouldn't be allowed to add duplicates
   this._update();
 };
 
@@ -47,11 +49,11 @@ SelectionGroup.prototype._remove = function (k, v) {
 };
 
 SelectionGroup.prototype._update = function () {
-  var badgeContainer = this._container.find('.facets-selection-group-badges');
-  badgeContainer.empty();
+  this._badgeContainer.empty();
+
   this._selections.forEach(function (badgeSpec) {
-    badgeContainer.append(selectionGroup_badge(badgeSpec));
-  });
+    this._badgeContainer.append(selectionGroup_badge(badgeSpec));
+  }, this);
 };
 
 /**

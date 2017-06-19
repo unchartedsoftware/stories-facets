@@ -395,14 +395,15 @@ Facets.prototype._init = function(groups, queries, noTransition) {
 	if ( noTransition ) {
 		this._container.addClass('facets-no-transition');
 	}
+
+  this._selectionGroup = new SelectionGroup(this._container);
+
 	this._queryGroup = new QueryGroup(this._container, queries || []);
 
 	// Create groups
 	this._groups = groups.map(function(groupSpec, index) {
 		return new Group(this, this._container, groupSpec, this._options, index);
 	}.bind(this));
-
-  this._selectionGroup = new SelectionGroup(this._container);
 
 	this._bindClientEvents();
 
