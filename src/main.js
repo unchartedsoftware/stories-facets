@@ -20,6 +20,7 @@ var _ = require('./util/util');
 var IBindable = require('./components/IBindable');
 var Group = require('./components/group');
 var QueryGroup = require('./components/querygroup');
+var SelectionGroup = require('./components/selectiongroup');
 var Template = require('./templates/main');
 
 /**
@@ -59,6 +60,7 @@ Facets.prototype.select = function(subgroups, isQuery) {
 
 	subgroups.forEach(function(groupSpec) {
 		var group = this._getGroup(groupSpec.key);
+
 		if (!isQuery && group) {
 			if (!groupsInitialized) {
 				// Initialize selection state
@@ -73,6 +75,7 @@ Facets.prototype.select = function(subgroups, isQuery) {
 				var facet = group._getFacet(facetSpec.value);
 				if (facet) {
 					facet.select(facetSpec.selected || facetSpec);
+          this._selectionGroup._add(groupSpec.key, facetSpec.value);
 				}
 			}.bind(this));
 		} else {
@@ -104,6 +107,7 @@ Facets.prototype.deselect = function(simpleGroups) {
 		this._groups.forEach(function (group) {
 			group.clearSelection();
 		});
+    this._selectionGroup._remove();
 	} else {
 		simpleGroups.forEach(function(simpleGroup) {
 			var group = this._getGroup(simpleGroup.key);
@@ -112,9 +116,11 @@ Facets.prototype.deselect = function(simpleGroups) {
 					var facet = group._getFacet(simpleGroup.value);
 					if (facet) {
 						facet.deselect();
+            this._selectionGroup._remove(simpleGroup.key, simpleGroup.value);
 					}
 				} else {
 					group.clearSelection();
+          this._selectionGroup._remove(simpleGroup.key);
 				}
 			}
 		}.bind(this));
@@ -395,6 +401,8 @@ Facets.prototype._init = function(groups, queries, noTransition) {
 	this._groups = groups.map(function(groupSpec, index) {
 		return new Group(this, this._container, groupSpec, this._options, index);
 	}.bind(this));
+
+  this._selectionGroup = new SelectionGroup(this._container);
 
 	this._bindClientEvents();
 
