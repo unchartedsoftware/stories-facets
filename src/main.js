@@ -78,6 +78,7 @@ Facets.prototype.select = function(subgroups, isQuery) {
           this._selectionGroup._add(groupSpec.key, facetSpec.value);
 				}
 			}.bind(this));
+      this._selectionGroup._update();
 		} else {
 			groupSpec.facets.forEach(function(facetSpec) {
 				var query = this._getQuery(groupSpec.key, facetSpec.value);
