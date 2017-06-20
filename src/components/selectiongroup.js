@@ -9,9 +9,9 @@ var SelectionBadge = require('./selectionBadge');
  * @param
  * @constructor
  */
-function SelectionGroup(container, selectionBadges) {
-  this._selectionBadges = selectionBadges || [];
-  this._element = $(Template());
+function SelectionGroup(container, options) {
+  this._selectionBadges = [];
+  this._element = $(Template(options));
   this._container = container;
   this._container.append(this._element);
 

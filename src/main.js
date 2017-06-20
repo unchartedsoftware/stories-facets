@@ -57,6 +57,7 @@ Facets.prototype.constructor = Facets;
 Facets.prototype.select = function(subgroups, isQuery) {
 	var groupsInitialized = false;
 	var queriesInitialized = false;
+  var selected = [];
 
 	subgroups.forEach(function(groupSpec) {
 		var group = this._getGroup(groupSpec.key);
@@ -75,7 +76,7 @@ Facets.prototype.select = function(subgroups, isQuery) {
 				var facet = group._getFacet(facetSpec.value);
 				if (facet) {
 					facet.select(facetSpec.selected || facetSpec);
-          this._selectionGroup._add(groupSpec.key, facetSpec.value);
+          selected.push({key: groupSpec.key, value: facetSpec.value});
 				}
 			}.bind(this));
 		} else {
@@ -92,8 +93,13 @@ Facets.prototype.select = function(subgroups, isQuery) {
 			}.bind(this));
 		}
 	}.bind(this));
-  
-  this._bindClientEvents();
+
+  if (this._options.selectionBar) {
+    selected.forEach(function (facet) {
+      this._selectionGroup._add(facet.key, facet.value);
+    }.bind(this));
+    this._bindClientEvents();
+  }
 };
 
 /**
@@ -398,7 +404,7 @@ Facets.prototype._init = function(groups, queries, noTransition) {
 		this._container.addClass('facets-no-transition');
 	}
 
-  this._selectionGroup = new SelectionGroup(this._container);
+  this._selectionGroup = new SelectionGroup(this._container, this._options);
 
 	this._queryGroup = new QueryGroup(this._container, queries || []);
 
