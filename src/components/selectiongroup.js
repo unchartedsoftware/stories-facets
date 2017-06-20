@@ -18,6 +18,19 @@ function SelectionGroup(container, selectionBadges) {
   this._badgeContainer = this._container.find('.facets-selection-group-badges');
 }
 
+/**
+ * The selection badges in this group
+ *
+ * @property selectionBadges
+ * @type {Array}
+ * @readonly
+ */
+Object.defineProperty(SelectionGroup.prototype, 'selectionBadges', {
+	get: function () {
+		return this._selectionBadges;
+	}
+});
+
 SelectionGroup.prototype._add = function (k, v) {
   var badgeFound = this._getBadge(k, v);
 

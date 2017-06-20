@@ -43,7 +43,7 @@ Object.defineProperty(SelectionBadge.prototype, 'key', {
  * The value of this selection badge.
  *
  * @property value
- * @type {*}
+ * @type {string}
  * @readonly
  */
 Object.defineProperty(SelectionBadge.prototype, 'value', {

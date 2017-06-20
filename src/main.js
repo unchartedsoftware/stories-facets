@@ -92,6 +92,8 @@ Facets.prototype.select = function(subgroups, isQuery) {
 			}.bind(this));
 		}
 	}.bind(this));
+  
+  this._bindClientEvents();
 };
 
 /**
@@ -493,11 +495,17 @@ Facets.prototype._bindClientEvents = function(remove) {
 		this._groups.forEach(function(_group) {
 			this.unforward(_group);
 		}.bind(this));
+    this._selectionGroup.selectionBadges.forEach(function (_badge) {
+      this.unforward(_badge);
+    }.bind(this));
 	} else {
 		this.forward(this._queryGroup);
 		this._groups.forEach(function(_group) {
 			this.forward(_group);
 		}.bind(this));
+    this._selectionGroup.selectionBadges.forEach(function (_badge) {
+      this.forward(_badge);
+    }.bind(this));
 	}
 };
 
