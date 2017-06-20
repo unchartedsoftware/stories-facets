@@ -16,6 +16,8 @@ function SelectionBadge(container, spec) {
   this._spec = spec;
   this._key = spec.key;
   this._value = spec.value;
+
+  this._initialize();
 }
 
 /**
@@ -50,7 +52,7 @@ Object.defineProperty(SelectionBadge.prototype, 'value', {
 	}
 });
 
-SelectionBadge.prototype._update = function () {
+SelectionBadge.prototype._initialize = function () {
   this._element = $(Template(this._spec));
   this._container.append(this._element);
   this._addHandlers();

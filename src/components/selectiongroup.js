@@ -19,16 +19,13 @@ function SelectionGroup(container, selectionBadges) {
 }
 
 SelectionGroup.prototype._add = function (k, v) {
-  var badge = new SelectionBadge(this._badgeContainer, {key: k, value: v});
-  this._selectionBadges.push(badge); //TODO: Shouldn't be allowed to add duplicates
-  this._update();
-};
+  var badgeFound = this._getBadge(k, v);
 
-SelectionGroup.prototype._update = function () {
-  this._badgeContainer.empty();
-  this._selectionBadges.forEach(function (badge) {
-    badge._update();
-  });
+  //Avoid adding duplicates
+  if (badgeFound === null) {
+    var badge = new SelectionBadge(this._badgeContainer, {key: k, value: v});
+    this._selectionBadges.push(badge);
+  }
 };
 
 /**
@@ -39,7 +36,7 @@ SelectionGroup.prototype.removeAllBadges = function () {
   this._selectionBadges.forEach(function (bg) {
 		bg.destroy();
 	});
-  this.selectionBadges = [];
+  this._selectionBadges = [];
 };
 
 /**
