@@ -77,6 +77,16 @@ SelectionBadge.prototype._removeHandlers = function() {
 };
 
 /**
+ * Destroys this selection badge
+ *
+ * @method destroy
+ */
+SelectionBadge.prototype.destroy = function() {
+	this._removeHandlers();
+	this._element.remove();
+};
+
+/**
  * Search event handler.
  *
  * @param {Event} evt - Event to handle.

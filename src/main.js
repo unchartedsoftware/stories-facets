@@ -78,7 +78,6 @@ Facets.prototype.select = function(subgroups, isQuery) {
           this._selectionGroup._add(groupSpec.key, facetSpec.value);
 				}
 			}.bind(this));
-      this._selectionGroup._update();
 		} else {
 			groupSpec.facets.forEach(function(facetSpec) {
 				var query = this._getQuery(groupSpec.key, facetSpec.value);
@@ -108,7 +107,7 @@ Facets.prototype.deselect = function(simpleGroups) {
 		this._groups.forEach(function (group) {
 			group.clearSelection();
 		});
-    this._selectionGroup._remove();
+    this._selectionGroup.removeAllBadges();
 	} else {
 		simpleGroups.forEach(function(simpleGroup) {
 			var group = this._getGroup(simpleGroup.key);
@@ -117,11 +116,11 @@ Facets.prototype.deselect = function(simpleGroups) {
 					var facet = group._getFacet(simpleGroup.value);
 					if (facet) {
 						facet.deselect();
-            this._selectionGroup._remove(simpleGroup.key, simpleGroup.value);
+            this._selectionGroup.removeBadge(simpleGroup.key, simpleGroup.value);
 					}
 				} else {
 					group.clearSelection();
-          this._selectionGroup._remove(simpleGroup.key);
+          this._selectionGroup.removeBadgesByKey(simpleGroup.key);
 				}
 			}
 		}.bind(this));
@@ -476,6 +475,9 @@ Facets.prototype._destroyContents = function() {
 			g.destroy();
 		});
 	}
+
+  // remove selection badges
+  this._selectionGroup.destroy();
 };
 
 /**
