@@ -23,7 +23,6 @@ function SelectionGroup(container, options) {
  *
  * @property selectionBadges
  * @type {Array}
- * @readonly
  */
 Object.defineProperty(SelectionGroup.prototype, 'selectionBadges', {
 	get: function () {
@@ -31,14 +30,39 @@ Object.defineProperty(SelectionGroup.prototype, 'selectionBadges', {
 	}
 });
 
-SelectionGroup.prototype._add = function (k, v) {
-  var badgeFound = this._getBadge(k, v);
+SelectionGroup.prototype._add = function (key, facet) {
+  var value = facet.value;
+  var badgeFound = this._getBadge(key, value);
 
   //Avoid adding duplicates
   if (badgeFound === null) {
-    var badge = new SelectionBadge(this._badgeContainer, {key: k, value: v});
+    var label = this._generateBadgeLabel(facet);
+    var badgeSpec = {key: key, value: value, label: label};
+    var badge = new SelectionBadge(this._badgeContainer, badgeSpec);
     this._selectionBadges.push(badge);
   }
+};
+
+/**
+ * Creates a label to display on a badge.
+ *
+ * @method _generateBadgeLabel
+ * @param {Object} facet - facet selection data
+ * @returns {String}
+ */
+SelectionGroup.prototype._generateBadgeLabel = function (facet) {
+  var label = facet.value;
+
+  if ('selection' in facet) {
+    var selectionData = facet.selection;
+
+    if ('range' in selectionData) { //Range selections
+      var from = selectionData.range.from;
+      var to = selectionData.range.to;
+      label = from +' to '+to;
+    }
+  }
+  return label;
 };
 
 /**

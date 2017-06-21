@@ -57,7 +57,6 @@ Facets.prototype.constructor = Facets;
 Facets.prototype.select = function(subgroups, isQuery) {
 	var groupsInitialized = false;
 	var queriesInitialized = false;
-  var selected = [];
 
 	subgroups.forEach(function(groupSpec) {
 		var group = this._getGroup(groupSpec.key);
@@ -76,7 +75,7 @@ Facets.prototype.select = function(subgroups, isQuery) {
 				var facet = group._getFacet(facetSpec.value);
 				if (facet) {
 					facet.select(facetSpec.selected || facetSpec);
-          selected.push({key: groupSpec.key, value: facetSpec.value});
+          this._selectionGroup._add(groupSpec.key, facetSpec);
 				}
 			}.bind(this));
 		} else {
@@ -89,15 +88,13 @@ Facets.prototype.select = function(subgroups, isQuery) {
 						queriesInitialized = true;
 					}
 					query.select(facetSpec.selected);
+          this._selectionGroup._add(groupSpec.key, facetSpec);
 				}
 			}.bind(this));
 		}
 	}.bind(this));
 
   if (this._options.selectionBar) {
-    selected.forEach(function (facet) {
-      this._selectionGroup._add(facet.key, facet.value);
-    }.bind(this));
     this._bindClientEvents();
   }
 };

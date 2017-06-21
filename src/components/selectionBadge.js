@@ -16,6 +16,7 @@ function SelectionBadge(container, spec) {
   this._spec = spec;
   this._key = spec.key;
   this._value = spec.value;
+  this._label = spec.label;
 
   this._initialize();
 }
@@ -51,6 +52,20 @@ Object.defineProperty(SelectionBadge.prototype, 'value', {
 		return this._value;
 	}
 });
+
+/**
+ * This selection badge's label.
+ *
+ * @property label
+ * @type {string}
+ * @readonly
+ */
+Object.defineProperty(SelectionBadge.prototype, 'label', {
+	get: function () {
+		return this._label;
+	}
+});
+
 
 SelectionBadge.prototype._initialize = function () {
   this._element = $(Template(this._spec));
