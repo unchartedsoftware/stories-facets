@@ -51,28 +51,6 @@ BadgeGroup.prototype._createBadge = function (simpleGroup) {
 };
 
 /**
- * Creates a label to display on a badge.
- *
- * @method _generateBadgeLabel
- * @param {Object} facet - facet selection data
- * @returns {String}
- */
-/**SelectionGroup.prototype._generateBadgeLabel = function (facet) {
-  var label = facet.value;
-
-  if ('selection' in facet) {
-    var selectionData = facet.selection;
-
-    if ('range' in selectionData) { //Range selections
-      var from = selectionData.range.from;
-      var to = selectionData.range.to;
-      label = from +' to '+to;
-    }
-  }
-  return label;
-};*/
-
-/**
  * Removes all badges in this group
  * @method _removeAllBadges
  */
