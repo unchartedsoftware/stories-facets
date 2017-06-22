@@ -20,6 +20,7 @@ var Template = require('../templates/group');
 var TemplateMore = require('../templates/group-more');
 var FacetVertical = require('../components/facet/facetVertical');
 var FacetHorizontal = require('../components/facet/facetHorizontal');
+var FacetPlaceholder = require('../components/facet/FacetPlaceholder');
 
 var COLLAPSED_CLASS = 'facets-group-collapsed';
 var ELLIPSIS_VISIBLE_CLASS = 'group-facet-ellipsis-visible';
@@ -663,6 +664,12 @@ Group.prototype._createNewFacet = function (facetSpec, groupKey, hidden) {
 	if ('histogram' in facetSpec) {
 		// create a horizontal facet
 		return new FacetHorizontal(this._facetContainer, this, _.extend(facetSpec, {
+			key: groupKey,
+			hidden: hidden
+		}));
+	} else if ('placeholder' in facetSpec) {
+		// create a placeholder facet
+		return new FacetPlaceholder(this._facetContainer, this, _.extend(facetSpec, {
 			key: groupKey,
 			hidden: hidden
 		}));
