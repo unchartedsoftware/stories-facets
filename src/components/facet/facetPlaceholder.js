@@ -17,7 +17,7 @@
 var _ = require('../../util/util');
 var Facet = require('./facet');
 var Handlebars = require('handlebars');
-var Template = require('../../templates/FacetPlaceholder');
+var Template = require('../../templates/facetPlaceholder');
 
 var ABBREVIATED_CLASS = 'facets-facet-placeholder-abbreviated';
 var HIDDEN_CLASS = 'facets-facet-placeholder-hidden';
