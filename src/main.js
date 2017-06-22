@@ -20,7 +20,7 @@ var _ = require('./util/util');
 var IBindable = require('./components/IBindable');
 var Group = require('./components/group');
 var QueryGroup = require('./components/querygroup');
-var SelectionGroup = require('./components/selectiongroup');
+var BadgeGroup = require('./components/badgegroup');
 var Template = require('./templates/main');
 
 /**
@@ -75,7 +75,6 @@ Facets.prototype.select = function(subgroups, isQuery) {
 				var facet = group._getFacet(facetSpec.value);
 				if (facet) {
 					facet.select(facetSpec.selected || facetSpec);
-          this._selectionGroup._add(groupSpec.key, facetSpec);
 				}
 			}.bind(this));
 		} else {
@@ -88,15 +87,14 @@ Facets.prototype.select = function(subgroups, isQuery) {
 						queriesInitialized = true;
 					}
 					query.select(facetSpec.selected);
-          this._selectionGroup._add(groupSpec.key, facetSpec);
 				}
 			}.bind(this));
 		}
 	}.bind(this));
 
-  if (this._options.selectionBar) {
+  /**if (this._options.selectionBar) {
     this._bindClientEvents();
-  }
+  }*/
 };
 
 /**
@@ -112,7 +110,6 @@ Facets.prototype.deselect = function(simpleGroups) {
 		this._groups.forEach(function (group) {
 			group.clearSelection();
 		});
-    this._selectionGroup.removeAllBadges();
 	} else {
 		simpleGroups.forEach(function(simpleGroup) {
 			var group = this._getGroup(simpleGroup.key);
@@ -121,11 +118,9 @@ Facets.prototype.deselect = function(simpleGroups) {
 					var facet = group._getFacet(simpleGroup.value);
 					if (facet) {
 						facet.deselect();
-            this._selectionGroup.removeBadge(simpleGroup.key, simpleGroup.value);
 					}
 				} else {
 					group.clearSelection();
-          this._selectionGroup.removeBadgesByKey(simpleGroup.key);
 				}
 			}
 		}.bind(this));
@@ -179,6 +174,45 @@ Facets.prototype.highlight = function(simpleGroups, isQuery) {
 			}
 		}
 	}, this);
+};
+
+/**
+ * Creates badges for the provided facets.
+ *
+ * @method createBadges
+ * @param {Array} simpleGroups - An array containing the group keys and facet values to create badges for.
+  */
+Facets.prototype.createBadges = function(simpleGroups) {
+	simpleGroups.forEach(function(simpleGroup) {
+		var group = this._getGroup(simpleGroup.key);
+		if (group) {
+      this._badgeGroup._createBadge(simpleGroup.key, simpleGroup.value);
+		}
+	}, this);
+
+  this._bindClientEvents();
+};
+
+/**
+ * Removes badges for the provided facets.
+ *
+ * @method removeBadges
+ * @param {Array} simpleGroups - An array containing the group keys and facet values to remove badges for.
+ *                               If this value is omitted, all badges will be removed.
+  */
+Facets.prototype.removeBadges = function(simpleGroups) {
+  if (!simpleGroups) {
+    this._badgeGroup._removeAllBadges();
+	} else {
+    simpleGroups.forEach(function(simpleGroup) {
+  		var group = this._getGroup(simpleGroup.key);
+  		if (group) {
+        this._badgeGroup._removeBadge(simpleGroup.key, simpleGroup.value);
+  		}
+  	}, this);
+  }
+
+  this._bindClientEvents();
 };
 
 /**
@@ -401,7 +435,7 @@ Facets.prototype._init = function(groups, queries, noTransition) {
 		this._container.addClass('facets-no-transition');
 	}
 
-  this._selectionGroup = new SelectionGroup(this._container, this._options);
+  this._badgeGroup = new BadgeGroup(this._container, this._options);
 
 	this._queryGroup = new QueryGroup(this._container, queries || []);
 
@@ -482,7 +516,7 @@ Facets.prototype._destroyContents = function() {
 	}
 
   // remove selection badges
-  this._selectionGroup.destroy();
+  this._badgeGroup.destroy();
 };
 
 /**
@@ -498,7 +532,7 @@ Facets.prototype._bindClientEvents = function(remove) {
 		this._groups.forEach(function(_group) {
 			this.unforward(_group);
 		}.bind(this));
-    this._selectionGroup.selectionBadges.forEach(function (_badge) {
+    this._badgeGroup.badges.forEach(function (_badge) {
       this.unforward(_badge);
     }.bind(this));
 	} else {
@@ -506,7 +540,7 @@ Facets.prototype._bindClientEvents = function(remove) {
 		this._groups.forEach(function(_group) {
 			this.forward(_group);
 		}.bind(this));
-    this._selectionGroup.selectionBadges.forEach(function (_badge) {
+    this._badgeGroup.badges.forEach(function (_badge) {
       this.forward(_badge);
     }.bind(this));
 	}

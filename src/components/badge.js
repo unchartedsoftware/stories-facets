@@ -1,15 +1,15 @@
 var IBindable = require('../components/IBindable');
-var Template = require('../templates/selectionGroup_badge');
+var Template = require('../templates/badge');
 
 /**
- * Selection badge class
+ * Class representing a badge element.
  *
- * @class SelectionBadge
+ * @class Badge
  * @param {jquery} container - The container element for this badge.
  * @param
  * @constructor
  */
-function SelectionBadge(container, spec) {
+function Badge(container, spec) {
   IBindable.call(this);
 
   this._container = container;
@@ -24,8 +24,8 @@ function SelectionBadge(container, spec) {
 /**
  * @inheritance {IBindable}
  */
-SelectionBadge.prototype = Object.create(IBindable.prototype);
-SelectionBadge.prototype.constructor = SelectionBadge;
+Badge.prototype = Object.create(IBindable.prototype);
+Badge.prototype.constructor = Badge;
 
 /**
  * This selection badge's key.
@@ -34,7 +34,7 @@ SelectionBadge.prototype.constructor = SelectionBadge;
  * @type {string}
  * @readonly
  */
-Object.defineProperty(SelectionBadge.prototype, 'key', {
+Object.defineProperty(Badge.prototype, 'key', {
 	get: function () {
 		return this._key;
 	}
@@ -47,7 +47,7 @@ Object.defineProperty(SelectionBadge.prototype, 'key', {
  * @type {string}
  * @readonly
  */
-Object.defineProperty(SelectionBadge.prototype, 'value', {
+Object.defineProperty(Badge.prototype, 'value', {
 	get: function () {
 		return this._value;
 	}
@@ -60,14 +60,14 @@ Object.defineProperty(SelectionBadge.prototype, 'value', {
  * @type {string}
  * @readonly
  */
-Object.defineProperty(SelectionBadge.prototype, 'label', {
+Object.defineProperty(Badge.prototype, 'label', {
 	get: function () {
 		return this._label;
 	}
 });
 
 
-SelectionBadge.prototype._initialize = function () {
+Badge.prototype._initialize = function () {
   this._element = $(Template(this._spec));
   this._container.append(this._element);
   this._addHandlers();
@@ -79,7 +79,7 @@ SelectionBadge.prototype._initialize = function () {
  * @method _addHandlers
  * @private
  */
-SelectionBadge.prototype._addHandlers = function () {
+Badge.prototype._addHandlers = function () {
   this._element.find('.badge-deselect').on('click.badgeDeselect', this._onDeselect.bind(this));
 };
 
@@ -89,7 +89,7 @@ SelectionBadge.prototype._addHandlers = function () {
  * @method _removeHandlers
  * @private
  */
-SelectionBadge.prototype._removeHandlers = function() {
+Badge.prototype._removeHandlers = function() {
 	this._element.find('.badge-deselect').off('click.badgeDeselect');
 };
 
@@ -98,7 +98,7 @@ SelectionBadge.prototype._removeHandlers = function() {
  *
  * @method destroy
  */
-SelectionBadge.prototype.destroy = function() {
+Badge.prototype.destroy = function() {
 	this._removeHandlers();
 	this._element.remove();
 };
@@ -109,13 +109,13 @@ SelectionBadge.prototype.destroy = function() {
  * @param {Event} evt - Event to handle.
  * @private
  */
-SelectionBadge.prototype._onDeselect = function(evt) {
+Badge.prototype._onDeselect = function(evt) {
 	evt.stopPropagation();
 	this.emit('badge:deselect', evt, this._key, this._value);
 };
 
 /**
  * @export
- * @type {SelectionBadge}
+ * @type {Badge}
  */
-module.exports = SelectionBadge;
+module.exports = Badge;
