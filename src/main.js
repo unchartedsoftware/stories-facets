@@ -91,10 +91,6 @@ Facets.prototype.select = function(subgroups, isQuery) {
 			}.bind(this));
 		}
 	}.bind(this));
-
-  /**if (this._options.selectionBar) {
-    this._bindClientEvents();
-  }*/
 };
 
 /**
