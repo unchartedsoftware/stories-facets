@@ -128,10 +128,11 @@ Facets.prototype.deselect = function(simpleGroups) {
  * @method replace
  * @param {Object} groups - An object describing the groups of facets to be created.
  * @param {Object=} queries - Optional object describing the queries that should be created along with the facets.
+ * @param {boolean=} noTransition - If truthful will disable CSS transitions during init.
  */
-Facets.prototype.replace = function(groups, queries) {
+Facets.prototype.replace = function(groups, queries, noTransition) {
 	this._destroyContents();
-	this._init(groups, queries);
+	this._init(groups, queries, noTransition);
 };
 
 /**
@@ -380,9 +381,14 @@ Facets.prototype.destroy = function() {
  * @method _init
  * @param {Object} groups - An object describing the groups to instantiate with this widget.
  * @param {Object=} queries - An optional object describing the queries to instantiate with this widget.
+ * @param {boolean=} noTransition - If truthful will disable CSS transitions during init.
  * @private
  */
-Facets.prototype._init = function(groups, queries) {
+Facets.prototype._init = function(groups, queries, noTransition) {
+
+	if ( noTransition ) {
+		this._container.addClass('facets-no-transition');
+	}
 	this._queryGroup = new QueryGroup(this._container, queries || []);
 
 	// Create groups
@@ -391,6 +397,10 @@ Facets.prototype._init = function(groups, queries) {
 	}.bind(this));
 
 	this._bindClientEvents();
+
+    if ( noTransition ) {
+        this._container.removeClass('facets-no-transition');
+    }
 };
 
 /**
