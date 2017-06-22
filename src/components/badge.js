@@ -80,7 +80,7 @@ Badge.prototype._initialize = function () {
  * @private
  */
 Badge.prototype._addHandlers = function () {
-  this._element.find('.badge-deselect').on('click.badgeDeselect', this._onDeselect.bind(this));
+  this._element.find('.badge-close').on('click.badgeClose', this._onClose.bind(this));
 };
 
 /**
@@ -90,7 +90,7 @@ Badge.prototype._addHandlers = function () {
  * @private
  */
 Badge.prototype._removeHandlers = function() {
-	this._element.find('.badge-deselect').off('click.badgeDeselect');
+	this._element.find('.badge-close').off('click.badgeClose');
 };
 
 /**
@@ -109,9 +109,9 @@ Badge.prototype.destroy = function() {
  * @param {Event} evt - Event to handle.
  * @private
  */
-Badge.prototype._onDeselect = function(evt) {
+Badge.prototype._onClose = function(evt) {
 	evt.stopPropagation();
-	this.emit('badge:deselect', evt, this._key, this._value);
+	this.emit('badge:close', evt, this._key, this._value);
 };
 
 /**

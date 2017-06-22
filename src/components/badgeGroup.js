@@ -34,15 +34,16 @@ Object.defineProperty(BadgeGroup.prototype, 'badges', {
  * Creates a badge and adds it to this group.
  *
  * @method _createBadge
- * @param {*} key - The key of the badge to remove.
- * @param {*} value - The value of the badge to remove.
+ * @param {Object} simpleGroup Key, value and label (optional) of the badge to be created.
  */
-BadgeGroup.prototype._createBadge = function (key, value) {
+BadgeGroup.prototype._createBadge = function (simpleGroup) {
+  var key = simpleGroup.key;
+  var value = simpleGroup.value;
   var badgeFound = this._getBadge(key, value);
 
   //Avoid adding duplicates
   if (badgeFound === null) {
-    var label = value;
+    var label = !simpleGroup.label ? value : simpleGroup.label;
     var badgeSpec = {key: key, value: value, label: label};
     var badge = new Badge(this._badgeContainer, badgeSpec);
     this._badges.push(badge);

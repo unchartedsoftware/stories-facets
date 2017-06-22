@@ -180,14 +180,15 @@ Facets.prototype.highlight = function(simpleGroups, isQuery) {
  * @param {boolean=} isQuery - Optional parameter to define if the subgroup is a query, if not specified the method will try to auto-detect the group's type.
   */
 Facets.prototype.createBadges = function(simpleGroups, isQuery) {
+
   simpleGroups.forEach(function(simpleGroup) {
 		var group = this._getGroup(simpleGroup.key);
 		if (!isQuery && group) {
-			this._badgeGroup._createBadge(simpleGroup.key, simpleGroup.value);
+			this._badgeGroup._createBadge(simpleGroup);
 		} else {
-			var query = this._getQuery(simpleGroup.key, simpleGroup.value);
+			var query = this._getQuery(simpleGroup);
 			if (query) {
-				this._badgeGroup._createBadge(simpleGroup.key, simpleGroup.value);
+				this._badgeGroup._createBadge(simpleGroup);
 			}
 		}
 	}, this);
@@ -219,8 +220,6 @@ Facets.prototype.removeBadges = function(simpleGroups, isQuery) {
 			}
   	}, this);
   }
-
-  this._bindClientEvents();
 };
 
 /**
