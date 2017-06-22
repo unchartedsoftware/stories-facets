@@ -34,7 +34,9 @@ var HIDDEN_CLASS = 'facets-facet-placeholder-hidden';
 function FacetPlaceholder (container, parentGroup, spec) {
 	Facet.call(this, container, parentGroup, spec);
 	this._key = spec.key;
+	this._type = 'placeholder';
 	this._initializeLayout(Template);
+	this._setupHandlers();
 }
 
 /**
@@ -170,21 +172,60 @@ FacetPlaceholder.prototype._initializeLayout = function(template) {
 };
 
 /**
- * Adds the necessary event handlers for this object to function.
+ * Adds the required event handlers needed to trigger this facet's own events.
  *
  * @method _addHandlers
  * @private
  */
 FacetPlaceholder.prototype._addHandlers = function() {
+	if (this.visible) {
+		this._element.hover(
+			this._onMouseEnter.bind(this),
+			this._onMouseLeave.bind(this)
+		);
+		this._element.click(this._onClick.bind(this));
+	}
 };
 
 /**
- * Removes all the event handlers added by the `_addHandlers` function.
+ * Removes any added event handlers, virtually "muting" this facet
  *
  * @method _removeHandlers
  * @private
  */
 FacetPlaceholder.prototype._removeHandlers = function() {
+	this._element.off('click');
+	this._element.off('hover');
+};
+
+/**
+ * Click event handler.
+ *
+ * @param {Event} evt - Event to handle.
+ * @private
+ */
+FacetPlaceholder.prototype._onClick = function(evt) {
+	this.emit(this._type + ':click', evt, this._key);
+};
+
+/**
+ * Mouse enter event handler.
+ *
+ * @param {Event} evt - Event to handle.
+ * @private
+ */
+FacetPlaceholder.prototype._onMouseEnter = function(evt) {
+	this.emit(this._type + ':mouseenter', evt, this._key);
+};
+
+/**
+ * Mouse leave event handler.
+ *
+ * @param {Event} evt - Event to handle.
+ * @private
+ */
+FacetPlaceholder.prototype._onMouseLeave = function(evt) {
+	this.emit(this._type + ':mouseleave', evt, this._key);
 };
 
 /**
