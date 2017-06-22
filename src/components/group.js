@@ -363,14 +363,16 @@ Group.prototype.replace = function(groupSpec) {
 	/* remove event handlers */
 	this._removeHandlers();
 
+	// get the current index of the group, so we can insert it back
+	var index = this._element.index();
+
 	// Destroy existing facets
 	this._destroyFacets();
 	this._element.remove();
 	this._setupHandlers();
 
 	//reinit
-	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0);
-
+	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, index);
 
 	// initialize the new facets
 	this._initializeFacets(groupSpec);
@@ -465,14 +467,22 @@ Group.prototype._destroyFacets = function () {
  * @param {function} template - The templating function used to create the layout.
  * @param {string} label - The label to be used for this group.
  * @param {*} more - A value defining the 'more' behaviour of this group.
+ * @param {number} index - The index of the element to insert at.
  * @private
  */
-Group.prototype._initializeLayout = function (template, label, more) {
+Group.prototype._initializeLayout = function (template, label, more, index) {
 	this._element = $(template({
 		label: label,
 		more: more
 	}));
-	this._container.append(this._element);
+	if (index === undefined) {
+		// if no index is specified, append to container
+		this._container.append(this._element);
+	} else {
+		// otherwise insert at a specific index
+		this._element.insertAfter(this._container.children().get(index-1));
+	}
+
 	this._facetContainer = this._element.find('.group-facet-container');
 	this._groupContent = this._element.find('.facets-group');
 
