@@ -46,6 +46,14 @@ function main() {
         facets.createBadges([{ key : 'name', value: 'Mary'}, {key: 'name', value: 'Debbie'}, { key : 'fakeKey', value: 'fakeValue'}]);
       })
       .appendTo($controls);
+
+  $('<button/>')
+      .text('Query Badge')
+      .click(function() {
+        facets.createBadges([{ key : '*', value: 'Toronto'}]);
+      })
+      .appendTo($controls);
+
   $('<button/>')
       .text('Remove All')
       .click(function() {

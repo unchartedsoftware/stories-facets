@@ -177,12 +177,18 @@ Facets.prototype.highlight = function(simpleGroups, isQuery) {
  *
  * @method createBadges
  * @param {Array} simpleGroups - An array containing the group keys and facet values to create badges for.
+ * @param {boolean=} isQuery - Optional parameter to define if the subgroup is a query, if not specified the method will try to auto-detect the group's type.
   */
-Facets.prototype.createBadges = function(simpleGroups) {
-	simpleGroups.forEach(function(simpleGroup) {
+Facets.prototype.createBadges = function(simpleGroups, isQuery) {
+  simpleGroups.forEach(function(simpleGroup) {
 		var group = this._getGroup(simpleGroup.key);
-		if (group) {
-      this._badgeGroup._createBadge(simpleGroup.key, simpleGroup.value);
+		if (!isQuery && group) {
+			this._badgeGroup._createBadge(simpleGroup.key, simpleGroup.value);
+		} else {
+			var query = this._getQuery(simpleGroup.key, simpleGroup.value);
+			if (query) {
+				this._badgeGroup._createBadge(simpleGroup.key, simpleGroup.value);
+			}
 		}
 	}, this);
 
@@ -195,16 +201,22 @@ Facets.prototype.createBadges = function(simpleGroups) {
  * @method removeBadges
  * @param {Array} simpleGroups - An array containing the group keys and facet values to remove badges for.
  *                               If this value is omitted, all badges will be removed.
+ * @param {boolean=} isQuery - Optional parameter to define if the subgroup is a query, if not specified the method will try to auto-detect the group's type.
   */
-Facets.prototype.removeBadges = function(simpleGroups) {
+Facets.prototype.removeBadges = function(simpleGroups, isQuery) {
   if (!simpleGroups) {
     this._badgeGroup._removeAllBadges();
 	} else {
     simpleGroups.forEach(function(simpleGroup) {
   		var group = this._getGroup(simpleGroup.key);
-  		if (group) {
+  		if (!isQuery && group) {
         this._badgeGroup._removeBadge(simpleGroup.key, simpleGroup.value);
-  		}
+  		} else {
+				var query = this._getQuery(simpleGroup.key, simpleGroup.value);
+				if (query) {
+					this._badgeGroup._removeBadge(simpleGroup.key, simpleGroup.value);
+				}
+			}
   	}, this);
   }
 
