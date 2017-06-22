@@ -186,7 +186,7 @@ Facets.prototype.createBadges = function(simpleGroups, isQuery) {
 		if (!isQuery && group) {
 			this._badgeGroup._createBadge(simpleGroup);
 		} else {
-			var query = this._getQuery(simpleGroup);
+			var query = this._getQuery(simpleGroup.key, simpleGroup.value);
 			if (query) {
 				this._badgeGroup._createBadge(simpleGroup);
 			}
