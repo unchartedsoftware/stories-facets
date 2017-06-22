@@ -18,20 +18,27 @@
 
 .facets-badge-group {
   padding: 4px 8px;
-  background-color: #F8F8F8;
+  color: #222;
 
   .facets-badges {
+    min-height: 25px;
 
-    /**.facets-selection-group-filter {
-      font-size: $facet_icon_size;
-    }*/
+    .facets-badges-title {
+      display: inline-block;
+      margin-right: 2px;
+      float: left;
+      font-size: 14px;
+      line-height: 25px;
+      font-family: Oswald;
+    }
 
     .facets-badge {
-      height: 20px;
       display: inline-block;
-      margin-left: 4px;
-      margin-right: 4px;
-      color: #222;
+      margin: 2px;
+      cursor: default;
+      border-radius: 2px;
+      padding: 2px 4px;
+      background: #e5e5e5;
 
       .badge-label {
         max-width: 100px;
@@ -39,13 +46,19 @@
     		white-space: nowrap;
     		overflow: hidden;
         float: left;
+        line-height: 17px;
+        font-size: $facet_button_size;
       }
 
       .badge-close {
         font-size: $facet_button_size;
         float: right;
-        height: 100%;
-        vertical-align: middle;
+        cursor: pointer;
+        margin-left: 4px;
+
+         .badge-close-icon {
+           line-height: 17px;
+         }
       }
     }
   }
