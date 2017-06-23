@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Uncharted Software Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var Template = require('../templates/BadgeGroup');
 var Badge = require('./badge');
 
@@ -6,7 +22,7 @@ var Badge = require('./badge');
  *
  * @class BadgeGroup
  * @param {jquery} container - The container where this group will be added.
- * @param
+ * @param {Object=} options - Optional object with configuration options for the facets instance.
  * @constructor
  */
 function BadgeGroup(container, options) {
@@ -19,7 +35,7 @@ function BadgeGroup(container, options) {
 }
 
 /**
- * The badges in this group
+ * List of badges in this group
  *
  * @property badges
  * @type {Array}
@@ -31,10 +47,11 @@ Object.defineProperty(BadgeGroup.prototype, 'badges', {
 });
 
 /**
- * Creates a badge and adds it to this group.
+ * Creates badge(s) for each simpleGroup and adds it to this group.
  *
  * @method _createBadge
  * @param {Object} simpleGroup Key, value and label (optional) of the badge to be created.
+ * @private
  */
 BadgeGroup.prototype._createBadge = function (simpleGroup) {
   var key = simpleGroup.key;
@@ -53,6 +70,7 @@ BadgeGroup.prototype._createBadge = function (simpleGroup) {
 /**
  * Removes all badges in this group
  * @method _removeAllBadges
+ * @private
  */
 BadgeGroup.prototype._removeAllBadges = function () {
   this._badges.forEach(function (bg) {
@@ -62,11 +80,12 @@ BadgeGroup.prototype._removeAllBadges = function () {
 };
 
 /**
- * Removes a badge from this group.
+ * Removes a badge from this group with the specified key and value.
  *
  * @method _removeBadge
  * @param {*} key - The key of the badge to remove.
  * @param {*} value - The value of the badge to remove.
+ * @private
  */
 BadgeGroup.prototype._removeBadge = function (key, value) {
 	var badge = this._getBadge(key, value);
@@ -80,11 +99,12 @@ BadgeGroup.prototype._removeBadge = function (key, value) {
 };
 
 /**
- * Gets the badge represented with the specified key and value.
+ * Gets the badge with the specified key and value.
  *
  * @method _getBadge
  * @param {*} key - The key to look for.
  * @param {*} value - The value to look for.
+ * @private
  * @returns {Badge|null}
  */
 BadgeGroup.prototype._getBadge = function (key, value) {

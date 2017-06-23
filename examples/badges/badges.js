@@ -21,7 +21,7 @@ function main() {
 
     var groups = getSampleGroups();
 
-    var facets = new Facets(container, groups, searches, {enableBadges: true});
+    var facets = new Facets(container, groups, searches, {enableBadges: true, badgesTitle: 'Badges:'});
 
     facets.on("facet:click", function(e, key, value) {
       facets.createBadges([
@@ -32,7 +32,7 @@ function main() {
       ]);
   	});
 
-    facets.on('badge:deselect', function(evt, key, value) {
+    facets.on('badge:close', function(evt, key, value) {
         console.log('Removing badge: '+key+' '+value);
         facets.removeBadges([{key: key, value: value}]);
     });

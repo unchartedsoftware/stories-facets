@@ -60,7 +60,6 @@ Facets.prototype.select = function(subgroups, isQuery) {
 
 	subgroups.forEach(function(groupSpec) {
 		var group = this._getGroup(groupSpec.key);
-
 		if (!isQuery && group) {
 			if (!groupsInitialized) {
 				// Initialize selection state

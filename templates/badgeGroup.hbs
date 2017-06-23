@@ -1,9 +1,11 @@
 {{#if enableBadges}}
   <div class="facets-group facets-badge-group">
     <div class="facets-badges">
-      <span class="facets-badges-title">
-        Badges:
-      </span>
+      {{#if badgesTitle}}
+        <span class="facets-badges-title">
+          {{{badgesTitle}}}
+        </span>
+      {{/if}}
     </div>
   </div>
 {{/if}}

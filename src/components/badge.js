@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Uncharted Software Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 var IBindable = require('../components/IBindable');
 var Template = require('../templates/badge');
 
@@ -6,7 +22,7 @@ var Template = require('../templates/badge');
  *
  * @class Badge
  * @param {jquery} container - The container element for this badge.
- * @param
+ * @param {Object} spec - An object describing this badge.
  * @constructor
  */
 function Badge(container, spec) {
@@ -28,7 +44,7 @@ Badge.prototype = Object.create(IBindable.prototype);
 Badge.prototype.constructor = Badge;
 
 /**
- * This selection badge's key.
+ * This key of this badge.
  *
  * @property key
  * @type {string}
@@ -41,7 +57,7 @@ Object.defineProperty(Badge.prototype, 'key', {
 });
 
 /**
- * The value of this selection badge.
+ * The value of this badge.
  *
  * @property value
  * @type {string}
@@ -54,7 +70,7 @@ Object.defineProperty(Badge.prototype, 'value', {
 });
 
 /**
- * This selection badge's label.
+ * The display label of this badge.
  *
  * @property label
  * @type {string}
@@ -66,7 +82,12 @@ Object.defineProperty(Badge.prototype, 'label', {
 	}
 });
 
-
+/**
+ * Appends the badge element to the DON, adds event handlers.
+ *
+ * @method _initialize
+ * @private
+ */
 Badge.prototype._initialize = function () {
   this._element = $(Template(this._spec));
   this._container.append(this._element);
