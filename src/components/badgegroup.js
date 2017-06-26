@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-var Template = require('../templates/BadgeGroup');
+var Template = require('../templates/badgegroup');
 var Badge = require('./badge');
 
 /**
