@@ -363,6 +363,20 @@ Facets.prototype.removeFacet = function(key, value) {
 };
 
 /**
+ * Removes the group with the specified key.
+ *
+ * @method removeGroup
+ * @param {*} key - The key of the group containing the facet to remove.
+ */
+Facets.prototype.removeGroup = function(key) {
+	var group = this._getGroup(key);
+	if (group) {
+		group.destroy();
+		this._groups.splice(this._groups.indexOf(group), 1);
+	}
+};
+
+/**
  * Adds a query to the query group in this widget.
  *
  * @method addQuery
