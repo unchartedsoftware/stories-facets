@@ -61,7 +61,7 @@ module.exports = {
 	},
 
 	_findFacetElement: function(facetsComponent, groupKey, facetValue) {
-		var group = facetsComponent._getGroup(groupKey);
+		var group = facetsComponent.getGroup(groupKey);
 		return group._getFacet(facetValue);
 	},
 
@@ -86,7 +86,7 @@ module.exports = {
 	},
 
 	findSearchIcon: function(facetsComponent, groupStr, facetString) {
-		var group = facetsComponent._getGroup(groupStr);
+		var group = facetsComponent.getGroup(groupStr);
 		var facet = group._getFacet(facetString);
 		return facet._element.find('.facet-search');
 	},

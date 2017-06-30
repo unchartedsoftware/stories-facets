@@ -71,15 +71,15 @@ describe('Replace', function() {
 		// Then expect old elements are removed...
 		expect(facetsComponent._getQuery('*', 'test phrase')).to.be.null;
 		expect(facetsComponent._getQuery('*', 'query text')).to.be.null;
-		expect(facetsComponent._getGroup('phones')).to.be.null;
-		expect(facetsComponent._getGroup('names')).to.be.null;
+		expect(facetsComponent.getGroup('phones')).to.be.null;
+		expect(facetsComponent.getGroup('names')).to.be.null;
 
 		// ... and new elements are added
 		var torontoQuery = facetsComponent._getQuery('place', 'toronto');
 		var torontoQueryElement = torontoQuery._element;
 		testSupport.verifyQuery(torontoQuery, torontoQueryElement, 'place', 'toronto', 6, 6, '100%');
 
-		var websiteGroup = facetsComponent._getGroup('websites');
+		var websiteGroup = facetsComponent.getGroup('websites');
 		var firstFacet = websiteGroup._getFacet('www.test1.example.com');
 		var secondFacet = websiteGroup._getFacet('www.test2.example.com');
 		testSupport.verifyFacet(firstFacet, firstFacet._element, 'websites', 'www.test1.example.com', 30, 60, 'grey', '50%');
@@ -122,7 +122,7 @@ describe('Replace', function() {
 		facetsComponent.replace(newGroupSpecs, newQuerySpecs);
 
 		// ...and events are triggerred
-		var websiteGroup = facetsComponent._getGroup('websites'),
+		var websiteGroup = facetsComponent.getGroup('websites'),
 			websiteMore = websiteGroup._element.find('.group-more-target'),
 			websiteGroupExpandIcon = websiteGroup._element.find('.group-expander'),
 			websiteFacet = websiteGroup._getFacet('www.test1.example.com'),

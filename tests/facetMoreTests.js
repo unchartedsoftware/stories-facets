@@ -54,19 +54,19 @@ describe('More', function() {
 
 	it('Displays a more link if provided', function() {
 		// Phone group has more link
-		var phoneGroup = facetsComponent._getGroup('phone');
+		var phoneGroup = facetsComponent.getGroup('phone');
 		var phoneMoreCount = phoneGroup._element.find('.group-other-label-count');
 		expect(phoneMoreCount.text()).to.equal('15+');
 
 		// Name group does not have more link
-		var nameGroup = facetsComponent._getGroup('name');
+		var nameGroup = facetsComponent.getGroup('name');
 		var nameMoreCount = nameGroup._element.find('.group-other-label-count');
 		expect(nameMoreCount.text()).to.equal('');
 	});
 
 	it('Emits more event with group key', function() {
 		// Given
-		var phoneGroup = facetsComponent._getGroup('phone'),
+		var phoneGroup = facetsComponent.getGroup('phone'),
 			phoneMore = phoneGroup._element.find('.group-more-target'),
 			onGroupMore = sinon.spy();
 
@@ -91,7 +91,7 @@ describe('More', function() {
 		]);
 
 		// ...and the newly added more link is clicked
-		var nameGroup = facetsComponent._getGroup('name'),
+		var nameGroup = facetsComponent.getGroup('name'),
 			nameMore = nameGroup._element.find('.group-more-target');
 		nameMore.trigger('click');
 

@@ -57,7 +57,7 @@ describe('Display', function() {
 		var secondQueryElement = secondQuery._element;
 		testSupport.verifyQuery(secondQuery, secondQueryElement, '*', 'Toronto', 6, 10, '60%');
 
-		var phoneGroup = facetsComponent._getGroup('phones');
+		var phoneGroup = facetsComponent.getGroup('phones');
 		var firstFacet = phoneGroup._getFacet('111 111 1111');
 		var secondFacet = phoneGroup._getFacet('222 222 2222');
 		testSupport.verifyFacet(firstFacet, firstFacet._element, 'phones', '111 111 1111', 10, 40, 'orange', '25%'); // total is sum of facets in group
@@ -80,7 +80,7 @@ describe('Display', function() {
 		expect(facetsComponent._queryGroup.visible).to.equal(false);
 
 		// And facet groups rendered same as always
-		var phoneGroup = facetsComponent._getGroup('phones');
+		var phoneGroup = facetsComponent.getGroup('phones');
 		var firstFacet = phoneGroup._getFacet('111 111 1111');
 		var secondFacet = phoneGroup._getFacet('222 222 2222');
 		testSupport.verifyFacet(firstFacet, firstFacet._element, 'phones', '111 111 1111', 10, 40, 'orange', '25%'); // total is sum of facets in group
@@ -100,7 +100,7 @@ describe('Display', function() {
 		var facetsComponent = new Facets(container[0], groups);
 
 		// Then
-		var personaGroup = facetsComponent._getGroup('persona');
+		var personaGroup = facetsComponent.getGroup('persona');
 		var personaFacet = personaGroup._getFacet('333 333 3333');
 		var personaLink = personaFacet._element.find('.facet-links');
 		expect(personaLink.text().trim()).to.equal('333');

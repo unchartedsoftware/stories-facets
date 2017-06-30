@@ -134,7 +134,7 @@ describe('Search', function() {
 		expect(onFacetClick.called).to.be.false;
 
 		// However, when the general area of the facet is clicked...
-		var nameGroup = facetsComponent._getGroup('name');
+		var nameGroup = facetsComponent.getGroup('name');
 		var secondNameFacet = nameGroup._getFacet('Maya');
 		$(secondNameFacet._element).trigger('click');
 

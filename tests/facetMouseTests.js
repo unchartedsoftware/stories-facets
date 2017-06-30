@@ -60,7 +60,7 @@ describe('Mouse Events', function() {
 		facetsComponent.on('facet:mouseleave', onMouseLeave);
 
 		// When first phone icon is hovered over
-		var phoneGroup = facetsComponent._getGroup('phone'),
+		var phoneGroup = facetsComponent.getGroup('phone'),
 			firstPhoneFacet = phoneGroup._getFacet('111 111 1111'),
 			firstPhoneIcon = firstPhoneFacet._element.find('.facet-icon');
 		firstPhoneIcon.trigger('mouseenter');
@@ -89,7 +89,7 @@ describe('Mouse Events', function() {
 		]);
 
 		// ...and the newly added name icon is hovered over
-		var nameGroup = facetsComponent._getGroup('name'),
+		var nameGroup = facetsComponent.getGroup('name'),
 			johnFacet = nameGroup._getFacet('John'),
 			johnIcon = johnFacet._element.find('.facet-icon');
 		johnIcon.trigger('mouseenter');
@@ -117,7 +117,7 @@ describe('Mouse Events', function() {
 		facetsComponent.off('facet:mouseleave');
 
 		// ... and a hover is triggerred
-		var phoneGroup = facetsComponent._getGroup('phone'),
+		var phoneGroup = facetsComponent.getGroup('phone'),
 			firstPhoneFacet = phoneGroup._getFacet('111 111 1111'),
 			firstPhoneIcon = firstPhoneFacet._element.find('.facet-icon');
 		firstPhoneIcon.trigger('mouseenter');
