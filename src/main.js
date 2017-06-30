@@ -515,6 +515,8 @@ Facets.prototype.getGroup = function(key) {
 		return null;
 	}
 };
+// alias for backwards compatibility
+Facets.prototype._getGroup = Facets.prototype.getGroup;
 
 /**
  * Internal method to destroy the groups, facets and queries contained in this widget.
