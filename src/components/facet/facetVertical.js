@@ -453,6 +453,7 @@ FacetVertical.prototype._updateSparkline = function() {
 			selectedSparklinePath.appendTo(sparkline);
 
 			totalSparklinePath[0].classList.add('facet-sparkline-total');
+            totalSparklinePath[0].classList.add('facetkey-sparkline-total');
 			selectedSparklinePath[0].classList.add('facet-sparkline-selected');
 
 			if (this._spec.isQuery && this._spec.icon && this._spec.icon.color) {
