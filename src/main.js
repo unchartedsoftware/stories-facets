@@ -20,6 +20,7 @@ var _ = require('./util/util');
 var IBindable = require('./components/IBindable');
 var Group = require('./components/group');
 var QueryGroup = require('./components/querygroup');
+var BadgeGroup = require('./components/badgegroup');
 var Template = require('./templates/main');
 
 /**
@@ -168,6 +169,56 @@ Facets.prototype.highlight = function(simpleGroups, isQuery) {
 			}
 		}
 	}, this);
+};
+
+/**
+ * Creates badges for the provided facets.
+ *
+ * @method createBadges
+ * @param {Array} simpleGroups - An array containing the group keys and facet values to create badges for.
+ * @param {boolean=} isQuery - Optional parameter to define if the subgroup is a query, if not specified the method will try to auto-detect the group's type.
+  */
+Facets.prototype.createBadges = function(simpleGroups, isQuery) {
+
+  simpleGroups.forEach(function(simpleGroup) {
+		var group = this._getGroup(simpleGroup.key);
+		if (!isQuery && group) {
+			this._badgeGroup._createBadge(simpleGroup);
+		} else {
+			var query = this._getQuery(simpleGroup.key, simpleGroup.value);
+			if (query) {
+				this._badgeGroup._createBadge(simpleGroup);
+			}
+		}
+	}, this);
+
+  this._bindClientEvents();
+};
+
+/**
+ * Removes badges for the provided facets.
+ *
+ * @method removeBadges
+ * @param {Array} simpleGroups - An array containing the group keys and facet values to remove badges for.
+ *                               If this value is omitted, all badges will be removed.
+ * @param {boolean=} isQuery - Optional parameter to define if the subgroup is a query, if not specified the method will try to auto-detect the group's type.
+  */
+Facets.prototype.removeBadges = function(simpleGroups, isQuery) {
+  if (!simpleGroups) {
+    this._badgeGroup._removeAllBadges();
+	} else {
+    simpleGroups.forEach(function(simpleGroup) {
+  		var group = this._getGroup(simpleGroup.key);
+  		if (!isQuery && group) {
+        this._badgeGroup._removeBadge(simpleGroup.key, simpleGroup.value);
+  		} else {
+				var query = this._getQuery(simpleGroup.key, simpleGroup.value);
+				if (query) {
+					this._badgeGroup._removeBadge(simpleGroup.key, simpleGroup.value);
+				}
+			}
+  	}, this);
+  }
 };
 
 /**
@@ -389,6 +440,9 @@ Facets.prototype._init = function(groups, queries, noTransition) {
 	if ( noTransition ) {
 		this._container.addClass('facets-no-transition');
 	}
+
+  this._badgeGroup = new BadgeGroup(this._container, this._options);
+
 	this._queryGroup = new QueryGroup(this._container, queries || []);
 
 	// Create groups
@@ -466,6 +520,9 @@ Facets.prototype._destroyContents = function() {
 			g.destroy();
 		});
 	}
+
+  // remove selection badges
+  this._badgeGroup.destroy();
 };
 
 /**
@@ -481,11 +538,17 @@ Facets.prototype._bindClientEvents = function(remove) {
 		this._groups.forEach(function(_group) {
 			this.unforward(_group);
 		}.bind(this));
+    this._badgeGroup.badges.forEach(function (_badge) {
+      this.unforward(_badge);
+    }.bind(this));
 	} else {
 		this.forward(this._queryGroup);
 		this._groups.forEach(function(_group) {
 			this.forward(_group);
 		}.bind(this));
+    this._badgeGroup.badges.forEach(function (_badge) {
+      this.forward(_badge);
+    }.bind(this));
 	}
 };
 
