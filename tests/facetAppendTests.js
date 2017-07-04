@@ -59,13 +59,13 @@ describe('Append', function() {
 		testSupport.verifyQuery(secondQueryQuery, secondQueryQuery._element, '*', 'second query', 8, 10, '80%');
 
 		// Verify baseline groups/facets
-		var phoneGroup = facetsComponent._getGroup('phones');
+		var phoneGroup = facetsComponent.getGroup('phones');
 		var firstPhoneFacet = phoneGroup._getFacet('111 111 1111');
 		var secondPhoneFacet = phoneGroup._getFacet('222 222 2222');
 		testSupport.verifyFacet(firstPhoneFacet, firstPhoneFacet._element, 'phones', '111 111 1111', 10, 40, 'orange', '25%');
 		testSupport.verifyFacet(secondPhoneFacet, secondPhoneFacet._element, 'phones', '222 222 2222', 30, 40, 'blue', '75%');
 
-		var nameGroup = facetsComponent._getGroup('names');
+		var nameGroup = facetsComponent.getGroup('names');
 		var firstNameFacet = nameGroup._getFacet('Maya');
 		testSupport.verifyFacet(firstNameFacet, firstNameFacet._element, 'names', 'Maya', 20, 20, 'grey', '100%');
 	});
@@ -84,7 +84,7 @@ describe('Append', function() {
 		facetsComponent.append(groupsToAppend);
 
 		// Then expect names group to be updated
-		var nameGroup = facetsComponent._getGroup('names');
+		var nameGroup = facetsComponent.getGroup('names');
 		var firstNameFacet = nameGroup._getFacet('Maya');
 		var secondNameFacet = nameGroup._getFacet('John');
 		testSupport.verifyFacet(firstNameFacet, firstNameFacet._element, 'names', 'Maya', 20, 80, 'grey', '25%');
@@ -101,7 +101,7 @@ describe('Append', function() {
 		facetsComponent.append(groupsToAppend);
 
 		// Then expect new group added
-		var fooGroup = facetsComponent._getGroup('foo');
+		var fooGroup = facetsComponent.getGroup('foo');
 		var fooFacet = fooGroup._getFacet('bar');
 		testSupport.verifyFacet(fooFacet, fooFacet._element, 'foo', 'bar', 60, 60, 'grey', '100%');
 	});
@@ -116,7 +116,7 @@ describe('Append', function() {
 		facetsComponent.append(groupsToAppend);
 
 		// Then expect phone group modified
-		var phoneGroup = facetsComponent._getGroup('phones');
+		var phoneGroup = facetsComponent.getGroup('phones');
 		var firstPhoneFacet = phoneGroup._getFacet('111 111 1111');
 		var secondPhoneFacet = phoneGroup._getFacet('222 222 2222');
 		testSupport.verifyFacet(firstPhoneFacet, firstPhoneFacet._element, 'phones', '111 111 1111', 10, 50, 'orange', '20%');

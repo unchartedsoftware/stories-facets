@@ -91,8 +91,8 @@ describe('Destroy', function() {
 		facetsComponent.on('facet-group:more', onGroupMore);
 
 		// Then event handlers are persisted in component
-		var phoneGroup = facetsComponent._getGroup('phones');
-		var nameGroup = facetsComponent._getGroup('names');
+		var phoneGroup = facetsComponent.getGroup('phones');
+		var nameGroup = facetsComponent.getGroup('names');
 		var phoneFacet = phoneGroup._getFacet('111 111 1111');
 		var nameFacet = nameGroup._getFacet('Maya');
 

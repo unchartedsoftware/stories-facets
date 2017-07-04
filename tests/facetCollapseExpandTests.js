@@ -52,8 +52,8 @@ describe('Expand and Collapse', function() {
 	});
 
 	it('Groups are expanded by default', function() {
-		var phoneGroup = facetsComponent._getGroup('phone');
-		var nameGroup = facetsComponent._getGroup('name');
+		var phoneGroup = facetsComponent.getGroup('phone');
+		var nameGroup = facetsComponent.getGroup('name');
 
 		expect(phoneGroup.collapsed).to.be.false;
 		expect(phoneGroup._element.hasClass('facets-group-collapsed')).to.be.false;
@@ -63,7 +63,7 @@ describe('Expand and Collapse', function() {
 
 	it('Toggles group collapse on click', function() {
 		// Given
-		var phoneGroup = facetsComponent._getGroup('phone');
+		var phoneGroup = facetsComponent.getGroup('phone');
 		var phoneGroupExpander = phoneGroup._element.find('.group-expander');
 
 		// When
@@ -83,7 +83,7 @@ describe('Expand and Collapse', function() {
 
 	it('Emits collapse and expand events with group key', function() {
 		// Given
-		var phoneGroup = facetsComponent._getGroup('phone'),
+		var phoneGroup = facetsComponent.getGroup('phone'),
 			phoneGroupIcon = phoneGroup._element.find('.group-expander'),
 			onGroupCollapse = sinon.spy(),
 			onGroupExpand = sinon.spy();
@@ -117,7 +117,7 @@ describe('Expand and Collapse', function() {
 		]);
 
 		// ... and new group is collapsed and expanded
-		var fooGroup = facetsComponent._getGroup('foo'),
+		var fooGroup = facetsComponent.getGroup('foo'),
 			fooGroupIcon = fooGroup._element.find('.group-expander');
 		fooGroupIcon.trigger('click');
 		fooGroupIcon.trigger('click');

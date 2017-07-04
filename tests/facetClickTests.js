@@ -58,7 +58,7 @@ describe('Click', function() {
 		facetsComponent.on('facet:click', onFacetClick);
 
 		// When a facet is clicked
-		var phoneGroup = facetsComponent._getGroup('phone');
+		var phoneGroup = facetsComponent.getGroup('phone');
 		var secondPhoneFacet = phoneGroup._getFacet('222 222 2222');
 		$(secondPhoneFacet._element).trigger('click');
 
@@ -79,7 +79,7 @@ describe('Click', function() {
 		]);
 
 		// ... and the modified name is clicked
-		var nameGroup = facetsComponent._getGroup('name');
+		var nameGroup = facetsComponent.getGroup('name');
 		var secondNameFacet = nameGroup._getFacet('John');
 		$(secondNameFacet._element).trigger('click');
 
@@ -100,7 +100,7 @@ describe('Click', function() {
 		]);
 
 		// ... and the newly added name is clicked
-		var nameGroup = facetsComponent._getGroup('name');
+		var nameGroup = facetsComponent.getGroup('name');
 		var secondNameFacet = nameGroup._getFacet('Maya');
 		$(secondNameFacet._element).trigger('click');
 
@@ -120,7 +120,7 @@ describe('Click', function() {
 		facetsComponent.off('facet:click');
 
 		// ...and a facet is clicked
-		var phoneGroup = facetsComponent._getGroup('phone');
+		var phoneGroup = facetsComponent.getGroup('phone');
 		var secondPhoneFacet = phoneGroup._getFacet('222 222 2222');
 		$(secondPhoneFacet._element).trigger('click');
 

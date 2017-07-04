@@ -76,7 +76,7 @@ describe('Selection', function() {
 		facetsComponent.select(subgroups);
 
 		// Then name facets rendered as selected with additional bar
-		var nameGroup = facetsComponent._getGroup('name');
+		var nameGroup = facetsComponent.getGroup('name');
 		var mayaFacet = nameGroup._getFacet('Maya');
 		var debbieFacet = nameGroup._getFacet('Debbie');
 		testSupport.verifySelectedFacet(mayaFacet, mayaFacet._element, 'name', 'Maya', 30, 40, '75%', '10%');
@@ -101,7 +101,7 @@ describe('Selection', function() {
 		facetsComponent.deselect(subgroups);
 
 		// Then facets are unselected
-		var nameGroup = facetsComponent._getGroup('name');
+		var nameGroup = facetsComponent.getGroup('name');
 		var mayaFacet = nameGroup._getFacet('Maya');
 		var debbieFacet = nameGroup._getFacet('Debbie');
 		testSupport.verifyDeselectedFacet(mayaFacet, mayaFacet._element, 'name', 'Maya', 30, 40, 'grey', '75%');
