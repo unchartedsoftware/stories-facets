@@ -47,6 +47,24 @@ function Facets(container, groups, queries, options) {
 Facets.prototype = Object.create(IBindable.prototype);
 Facets.prototype.constructor = Facets;
 
+
+/**
+ * Re-arranges the facets by a sort function.
+ *
+ * @method sort
+ * @param {Function} sort - The sort function.
+ */
+Facets.prototype.sort = function(sort) {
+	this._groups.sort(sort);
+	this._groups.forEach(function(group) {
+		group._element.detach();
+	});
+	var container = this._container;
+	this._groups.forEach(function(group) {
+		group._element.appendTo(container);
+	});
+};
+
 /**
  * Selects the given facets.
  *
