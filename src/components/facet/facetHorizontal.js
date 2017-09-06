@@ -184,12 +184,12 @@ FacetHorizontal.prototype.select = function(data) {
 				for (var ii = 0, nn = barMetadata.length; ii < nn; ++ii) {
 					var slice = barMetadata[ii];
 
-					if (fromIsString && slice.label === from) {
+					if (fromIsString && (slice.label === from || +slice.label === +from)) {
 						from = i;
 						fromIsString = false;
 					}
 
-					if (toIsString && slice.toLabel === to) {
+					if (toIsString && (slice.toLabel === to || +slice.toLabel === +to)) {
 						to = i;
 						toIsString = false;
 					}
