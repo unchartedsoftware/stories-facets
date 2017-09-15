@@ -32,6 +32,7 @@ function FacetHistogram (svgContainer, spec) {
 	this._minBarWidth = ('minBarWidth' in spec) ? spec.minBarWidth : 3;
 	this._maxBarWidth = ('maxBarWidth' in spec) ? spec.maxBarWidth : Number.MAX_VALUE;
 	this._barPadding = ('barPadding' in spec) ? spec.barPadding : 1;
+	this._scaleFn = $.isFunction(spec.scaleFn) ? spec.scaleFn : false;
 	this._bars = [];
 	this._maxBarHeight = 0;
 
@@ -126,7 +127,12 @@ FacetHistogram.prototype.initializeSlices = function(svg, slices) {
 			count += slice.count;
 			metadata.push(slice);
 		}
-	  yMax = Math.max(yMax, count);
+
+		if(this._scaleFn) {
+			count = this._scaleFn(count);
+		}
+
+		yMax = Math.max(yMax, count);
 		var bar = new FacetBar(svg, x, barWidth, 0, svgHeight);
 		bar.highlighted = false;
 		bar.metadata = metadata;
@@ -140,6 +146,10 @@ FacetHistogram.prototype.initializeSlices = function(svg, slices) {
 		var total = 0;
 		for (var jj = 0; jj < metaDataArr.length; jj++){
 			total += metaDataArr[jj].count;
+		}
+
+		if(this._scaleFn) {
+			total = this._scaleFn(total);
 		}
 
 		this._bars[j].height = Math.ceil(svgHeight * (total/yMax));
@@ -209,6 +219,10 @@ FacetHistogram.prototype.select = function (slices) {
 			var count = 0;
 			if (slice.label in slices) {
 				count = slices[slice.label];
+			}
+
+			if(this._scaleFn) {
+				count = this._scaleFn(count);
 			}
 
 			var newHeight = Math.ceil(svgHeight * (count / yMax));

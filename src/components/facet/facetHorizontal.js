@@ -229,12 +229,13 @@ FacetHorizontal.prototype.deselect = function() {
  */
 FacetHorizontal.prototype.processSpec = function(inData) {
 	var histogram = this.processHistogram(inData.histogram);
+	histogram.scaleFn = inData.scaleFn;
 	var firstSlice = histogram.slices[0];
 	var lastSlice = histogram.slices[histogram.slices.length - 1];
 	var outData = {
 		histogram: histogram,
 		leftRangeLabel: firstSlice.label,
-		rightRangeLabel: lastSlice.toLabel || lastSlice.label,
+		rightRangeLabel: lastSlice.toLabel || lastSlice.label
 	};
 	return outData;
 };
