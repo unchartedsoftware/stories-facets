@@ -350,17 +350,6 @@ FacetVertical.prototype._initializeLayout = function(template) {
 	}
 
 	this._sparklineContainer = this._element.find('.facet-sparkline-container');
-
-	/* make sure all styles have been applied */
-	var i, n, off;
-	for (i = 0, n = this._element.length; i < n; ++i) {
-		off = this._element[i].offsetHeight; // trigger style recalculation.
-	}
-
-	var children = this._element.find('*');
-	for (i = 0, n = children.length; i < n; ++i) {
-		off = children[i].offsetHeight; // trigger style recalculation.
-	}
 };
 
 /**

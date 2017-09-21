@@ -656,9 +656,7 @@ Group.prototype._updateMore = function (more) {
 		more: more
 	}));
 	this._moreContainer = this._element.find('.group-more-container');
-	this._moreContainer.replaceWith(this._moreElement);
-	/* make sure the DOM is updated at this time */
-	this._moreElement.css('height');
+    this._moreContainer.replaceWith(this._moreElement);
 };
 
 /**

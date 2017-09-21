@@ -337,17 +337,6 @@ FacetHorizontal.prototype._initializeLayout = function(template) {
 	this._histogramFilter.setFilterPixelRange({ from: 0, to: this._histogram.totalWidth });
 
 	this._rangeControls = this._element.find('.facet-range-controls');
-
-	/* make sure all styles have been applied */
-	var i, n, off;
-	for (i = 0, n = this._element.length; i < n; ++i) {
-		off = this._element[i].offsetHeight; // trigger style recalculation.
-	}
-
-	var children = this._element.find('*');
-	for (i = 0, n = children.length; i < n; ++i) {
-		off = children[i].offsetHeight; // trigger style recalculation.
-	}
 };
 
 /**
