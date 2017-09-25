@@ -360,11 +360,10 @@ FacetVertical.prototype._initializeLayout = function(template) {
  */
 FacetVertical.prototype._addHandlers = function() {
 	if (this.visible) {
-		this._iconContainer.hover(
-			this._onMouseEnter.bind(this),
-			this._onMouseLeave.bind(this)
-		);
 		this._element.click(this._onClick.bind(this));
+		this._element.hover(
+			this._onMouseEnter.bind(this),
+			this._onMouseLeave.bind(this));
 		this._element.find('.facet-search-container').on('click.facetSearch', this._onSearch.bind(this));
 		this._element.find('.facet-links').on('click.facetLink', this._onLink.bind(this));
 		this._element.find('.facet-query-close').on('click.queryClose', this._onClose.bind(this));
@@ -378,8 +377,8 @@ FacetVertical.prototype._addHandlers = function() {
  * @private
  */
 FacetVertical.prototype._removeHandlers = function() {
-	this._iconContainer.off('hover');
 	this._element.off('click');
+	this._element.off('hover');
 	this._element.find('.facet-search-container').off('click.facetSearch');
 	this._element.find('.facet-links').off('click.facetLink');
 };
