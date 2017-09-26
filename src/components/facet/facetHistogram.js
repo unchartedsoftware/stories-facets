@@ -201,6 +201,22 @@ FacetHistogram.prototype.highlightRange = function (range) {
 };
 
 /**
+ * Highlights the given value range.
+ *
+ * @method highlightValueRange
+ * @param {{from: number, to: number}} range - The value range to highlight.
+ */
+FacetHistogram.prototype.highlightValueRange = function (range) {
+	var bars = this._bars;
+	for (var i = 0, n = bars.length; i < n; ++i) {
+		var meta = bars[i].metadata[0];
+		var from = +meta.label;
+		var to = +meta.toLabel;
+		bars[i].highlighted = (range.from >= from && range.to <= to);
+	}
+};
+
+/**
  * Selects the specified counts for each bar as specified in the `slices` parameter.
  *
  * @method select
