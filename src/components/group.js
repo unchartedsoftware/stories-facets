@@ -49,6 +49,7 @@ function Group(widget, container, groupSpec, options, index) {
 
 	this._canDrag = false;
 	this._dragging = false;
+	this._collapsible = groupSpec.collapsible !== undefined ? groupSpec.collapsible : true;
 	this._draggingX = 0;
 	this._draggingY = 0;
 	this._draggingYOffset = 0;
@@ -474,7 +475,8 @@ Group.prototype._destroyFacets = function () {
 Group.prototype._initializeLayout = function (template, label, more, index) {
 	this._element = $(template({
 		label: label,
-		more: more
+		more: more,
+		collapsible: this._collapsible
 	}));
 	if (index === undefined) {
 		// if no index is specified, append to container
