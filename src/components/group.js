@@ -373,6 +373,9 @@ Group.prototype.replace = function(groupSpec) {
 	this._element.remove();
 	this._setupHandlers();
 
+	// update collapsible state
+	this._collapsible = groupSpec.collapsible !== undefined ? groupSpec.collapsible : true;
+
 	//reinit
 	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, index);
 
