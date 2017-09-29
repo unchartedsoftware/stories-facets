@@ -235,7 +235,8 @@ FacetHorizontal.prototype.processSpec = function(inData) {
 	var outData = {
 		histogram: histogram,
 		leftRangeLabel: firstSlice.label,
-		rightRangeLabel: lastSlice.toLabel || lastSlice.label
+		rightRangeLabel: lastSlice.toLabel || lastSlice.label,
+		filterable: inData.filterable !== undefined ? inData.filterable : true
 	};
 	return outData;
 };
