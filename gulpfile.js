@@ -27,7 +27,7 @@ var filter          = require('gulp-filter');
 var concat          = require('gulp-concat');
 var runSequence     = require('run-sequence');
 var sass            = require('gulp-sass');
-var karma           = require('karma')
+var karma           = require('karma');
 var path            = require('path');
 var fs              = require('fs');
 
@@ -68,7 +68,7 @@ function doBuild(shouldMinify) {
 
 function doCSS(shouldMinify) {
     var build = gulp.src(config.style + '/' + config.name.toLowerCase() + (shouldMinify ? '.min' : '') + '.scss')
-        .pipe(sass.sync().on('error', sass.logError))
+        .pipe(sass.sync().on('error', sass.logError));
 
     if (shouldMinify) {
         build = build.pipe( minifyCss({ keepSpecialComments: 0 }) );
@@ -158,7 +158,9 @@ gulp.task('build-extern-css', function() {
 
 gulp.task('build-templates',function() {
     return gulp.src(config.templates + '/**/*.hbs')
-        .pipe(handlebars())
+        .pipe(handlebars({
+			handlebars: require('handlebars')
+		}))
         .pipe(defineModule('node'))
         .pipe(gulp.dest(config.src + '/templates/'));
 });
