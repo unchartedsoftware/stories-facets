@@ -324,6 +324,22 @@
 		height: 100%;
 	}
 
+	g:hover .facet-histogram-bar {
+		fill: $facet_histogram_bar_hover_color;
+	}
+
+	g:hover .facet-histogram-bar-highlighted {
+		fill: $facet_histogram_bar_highlighted_hover_color;
+	}
+
+	.facet-histogram-bar.facet-histogram-shadow-bar {
+		opacity: 0;
+		&:hover {
+			opacity: 0.3;
+			fill: $facet_histogram_bar_hover_color;
+		}
+	}
+
 	.facet-histogram-bar {
 		fill: $facet_histogram_bar_color;
 		&:hover {
