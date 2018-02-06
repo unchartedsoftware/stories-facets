@@ -507,6 +507,7 @@ Group.prototype._initializeFacets = function (spec) {
 		this._total = spec.total;
 	} else {
 		this._ownsTotal = false;
+		this._total = 0;
 		spec.facets.forEach(function (facetSpec) {
 			if (!('histogram' in facetSpec) && !('placeholder' in facetSpec)) { // it's not a horizontal or placeholder facet
 				this._total += facetSpec.count;
