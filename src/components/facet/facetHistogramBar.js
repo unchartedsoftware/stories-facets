@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
- var BAR_CLASSES = 'facet-histogram-bar facet-histogram-bar-transform';
- var HIGHLIGHTED_CLASS = 'facet-histogram-bar-highlighted';
+var BAR_CLASSES = 'facet-histogram-bar facet-histogram-bar-transform';
+var SHADOW_BAR_CLASS = 'facet-histogram-shadow-bar';
+var HIGHLIGHTED_CLASS = 'facet-histogram-bar-highlighted';
 
 /**
  * Helper class to create bars for the histogram.
@@ -37,6 +38,12 @@ function FacetHistogramBar (container, x, width, height, maxHeight) {
 	this._groupElement.css('transform', "translate(0, " + maxHeight + "px) scale(1, -1)");
 
 	container.append(this._groupElement);
+
+	this._shadowElement = $(document.createElementNS('http://www.w3.org/2000/svg','rect'));
+	this._shadowElement.attr('class', BAR_CLASSES + ' ' + SHADOW_BAR_CLASS);
+	this._shadowElement.attr('height', '100%');
+	this._shadowElement.css('height', '100%');
+	this._groupElement.append(this._shadowElement);
 
 	this._backElement = $(document.createElementNS('http://www.w3.org/2000/svg','rect'));
 	this._backElement.attr('class', BAR_CLASSES);
@@ -73,6 +80,7 @@ Object.defineProperty(FacetHistogramBar.prototype, 'x', {
 	set: function(value) {
 		this._element.attr('x', value);
 		this._backElement.attr('x', value);
+		this._shadowElement.attr('x', value);
 		this._x = value;
 	}
 });
@@ -91,6 +99,7 @@ Object.defineProperty(FacetHistogramBar.prototype, 'y', {
 	set: function(value) {
 		this._element.attr('y', value);
 		this._backElement.attr('y', value);
+		this._shadowElement.attr('y', value);
 		this._y = value;
 	}
 });
@@ -109,6 +118,7 @@ Object.defineProperty(FacetHistogramBar.prototype, 'width', {
 	set: function(value) {
 		this._element.attr('width', value);
 		this._backElement.attr('width', value);
+		this._shadowElement.attr('width', value);
 		this._width = value;
 	}
 });
@@ -296,17 +306,11 @@ Object.defineProperty(FacetHistogramBar.prototype, 'onClick', {
  * @private
  */
 FacetHistogramBar.prototype._addHandlers = function() {
-	this._element.hover(
+	this._groupElement.hover(
 		this._onMouseEnter.bind(this),
 		this._onMouseLeave.bind(this)
 	);
-	this._element.click(this._onClick.bind(this));
-
-	this._backElement.hover(
-		this._onMouseEnter.bind(this),
-		this._onMouseLeave.bind(this)
-	);
-	this._backElement.click(this._onClick.bind(this));
+	this._groupElement.click(this._onClick.bind(this));
 };
 
 /**
