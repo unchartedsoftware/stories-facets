@@ -65,7 +65,7 @@ function Group(widget, container, groupSpec, options, index) {
 		all: []
 	};
 
-	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0);
+	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, groupSpec.moreTotal);
 	this._initializeFacets(groupSpec);
 	/* collapsed state */
 	if (groupSpec.collapsed) {
@@ -304,7 +304,7 @@ Group.prototype.append = function (groupSpec) {
 	this._removeHandlers();
 
 	groupSpec.more = groupSpec.more || 0;
-	this._updateMore(groupSpec.more);
+	this._updateMore(groupSpec.more, groupSpec.moreTotal);
 
 	// make sure the group is not collapsed (so the append effect is visible)
 	this.collapsed = false;
@@ -377,14 +377,14 @@ Group.prototype.replace = function(groupSpec) {
 	this._collapsible = groupSpec.collapsible !== undefined ? groupSpec.collapsible : true;
 
 	//reinit
-	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, index);
+	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, groupSpec.moreTotal, index);
 
 	// initialize the new facets
 	this._initializeFacets(groupSpec);
 
 	// Update more link
 	groupSpec.more = groupSpec.more || 0;
-	this._updateMore(groupSpec.more);
+	this._updateMore(groupSpec.more, groupSpec.moreTotal);
 
 	/* collapsed state */
 	if (groupSpec.collapsed) {
@@ -472,10 +472,11 @@ Group.prototype._destroyFacets = function () {
  * @param {function} template - The templating function used to create the layout.
  * @param {string} label - The label to be used for this group.
  * @param {*} more - A value defining the 'more' behaviour of this group.
+ * @param {*} moreTotal - A value defining total count of the 'more' behaviour of this group.
  * @param {number} index - The index of the element to insert at.
  * @private
  */
-Group.prototype._initializeLayout = function (template, label, more, index) {
+Group.prototype._initializeLayout = function (template, label, more, moreTotal, index) {
 	this._element = $(template({
 		label: label,
 		more: more,
@@ -492,7 +493,7 @@ Group.prototype._initializeLayout = function (template, label, more, index) {
 	this._facetContainer = this._element.find('.group-facet-container');
 	this._groupContent = this._element.find('.facets-group');
 
-	this._updateMore(more);
+	this._updateMore(more, moreTotal);
 };
 
 /**
@@ -655,14 +656,18 @@ Group.prototype._getFacet = function (value) {
  *
  * @method _updateMore
  * @param {number||boolean} more - The number of extra facets available or a boolean specifying of there are more elements.
+ * @param {number} moreTotal - The number of extra counts available.
  * @private
  */
-Group.prototype._updateMore = function (more) {
+Group.prototype._updateMore = function (more, moreTotal) {
 	this._moreElement = $(TemplateMore({
 		more: more
 	}));
-	this._moreContainer = this._element.find('.group-more-container');
-    this._moreContainer.replaceWith(this._moreElement);
+	var moreContainer = this._element.find('.group-more-container');
+	moreContainer.replaceWith(this._moreElement);
+	if (moreTotal !== undefined) {
+		this._moreElement.find('.group-other-bar').css('width', ((moreTotal / this._total) * 100) + '%');
+	}
 };
 
 /**
