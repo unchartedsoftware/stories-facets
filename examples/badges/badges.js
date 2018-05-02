@@ -42,8 +42,8 @@ function main() {
   $('<button/>')
       .text('Multiple Badges')
       .click(function() {
-        //Cannot create a badge whose key/value does not exist as a facet
-        facets.createBadges([{ key : 'name', value: 'Mary'}, {key: 'name', value: 'Debbie'}, { key : 'fakeKey', value: 'fakeValue'}]);
+        //Badges can be created, even if they don't correspond to a facet
+        facets.createBadges([{ key : 'name', value: 'Mary'}, {key: 'name', value: 'Debbie'}, { key : 'hiddenFacetKey', value: 'hidden facet value'}]);
       })
       .appendTo($controls);
 

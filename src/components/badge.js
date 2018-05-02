@@ -83,7 +83,7 @@ Object.defineProperty(Badge.prototype, 'label', {
 });
 
 /**
- * Appends the badge element to the DON, adds event handlers.
+ * Appends the badge element to the DOM, adds event handlers.
  *
  * @method _initialize
  * @private
