@@ -199,8 +199,7 @@ Facets.prototype.highlight = function(simpleGroups, isQuery) {
 Facets.prototype.createBadges = function(simpleGroups, isQuery) {
 
   simpleGroups.forEach(function(simpleGroup) {
-		var group = this.getGroup(simpleGroup.key);
-		if (!isQuery && group) {
+		if (!isQuery) {
 			this._badgeGroup._createBadge(simpleGroup);
 		} else {
 			var query = this._getQuery(simpleGroup.key, simpleGroup.value);
