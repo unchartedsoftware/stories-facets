@@ -251,7 +251,8 @@ FacetHorizontal.prototype.processSpec = function(inData) {
  */
 FacetHorizontal.prototype.processHistogram = function(inData) {
 	var outData = {
-		slices: []
+		slices: [],
+		showOrigin: inData.showOrigin
 	};
 
 	var inSlices = inData.slices;

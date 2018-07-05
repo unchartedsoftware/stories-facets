@@ -35,6 +35,7 @@ function FacetHistogram (svgContainer, spec) {
 	this._scaleFn = $.isFunction(spec.scaleFn) ? spec.scaleFn : false;
 	this._bars = [];
 	this._maxBarHeight = 0;
+	this._showOrigin = ('showOrigin' in spec) ? spec.showOrigin : false;
 
 	this.initializeSlices(svgContainer, spec.slices);
 }
@@ -112,10 +113,15 @@ FacetHistogram.prototype.initializeSlices = function(svg, slices) {
 	var stackedBarsNumber = Math.ceil(barsLength / maxBarsNumber);
 	var barsToCreate = Math.ceil(barsLength / stackedBarsNumber);
 
+	var originLineWidth = 2;
+	//var containerWidth = this._showOrigin ? svgWidth - originLineWidth : svgWidth;
+
 	var barWidth = Math.floor((svgWidth - ((barsToCreate - 1) * barPadding)) / barsToCreate);
 	barWidth = Math.max(barWidth, minBarWidth);
 	barWidth = Math.min(barWidth, maxBarWidth);
 	this._barWidth = barWidth;
+
+	var originBar = null;
 
 	var yMax = 0;
 	for (var i = 0; i < barsLength; i += stackedBarsNumber) {
@@ -134,10 +140,49 @@ FacetHistogram.prototype.initializeSlices = function(svg, slices) {
 
 		yMax = Math.max(yMax, count);
 		var bar = new FacetBar(svg, x, barWidth, 0, svgHeight);
+
+		var from  = +slices[i].label;
+		var to = +slices[i].toLabel;
+		if (this._showOrigin && !originBar && from <= 0 && to >= 0) {
+			var originLineHeight = svgHeight * 1.5;
+			var verticalOffset = svgHeight * 0.2;
+			var originBarOffset = -from / (to - from);
+			var originX = x + originBarOffset * barWidth;
+
+			var originLine = $(document.createElementNS('http://www.w3.org/2000/svg','rect'));
+			originLine.attr('class', 'facet-histogram-origin-line');
+			originLine.attr('fill', '#000');
+			originLine.attr('height', originLineHeight + 'px');
+			originLine.css('height', originLineHeight + 'px');
+			originLine.attr('width', '1px');
+			originLine.css('width', '1px');
+			originLine.attr('x', originX);
+			originLine.attr('transform', 'translate(0, -' + verticalOffset + ')');
+			bar._groupElement.append(originLine);
+
+			var originLabel = $(document.createElementNS('http://www.w3.org/2000/svg','text'));
+			originLine.attr('class', 'facet-histogram-origin-label');
+			originLabel.attr('fill', '#000');
+			originLabel.attr('x', originX - 2);
+			originLabel.attr('y', 15);
+			originLabel.attr('font-size', 10);
+			originLabel.text('0');
+			originLabel.attr('transform', 'scale(1, -1)');
+			bar._groupElement.append(originLabel);
+
+			originBar = bar;
+		}
+
 		bar.highlighted = false;
 		bar.metadata = metadata;
 		this._bars.push(bar);
 		x += barWidth + barPadding;
+
+		if (originBar) {
+			// re-attach so that its z-index is highest
+			originBar._groupElement.remove();
+			svg.append(originBar._groupElement);
+		}
 	}
 
 	//Set the bar heights using the computed max y value
