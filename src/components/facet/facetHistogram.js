@@ -113,9 +113,6 @@ FacetHistogram.prototype.initializeSlices = function(svg, slices) {
 	var stackedBarsNumber = Math.ceil(barsLength / maxBarsNumber);
 	var barsToCreate = Math.ceil(barsLength / stackedBarsNumber);
 
-	var originLineWidth = 2;
-	//var containerWidth = this._showOrigin ? svgWidth - originLineWidth : svgWidth;
-
 	var barWidth = Math.floor((svgWidth - ((barsToCreate - 1) * barPadding)) / barsToCreate);
 	barWidth = Math.max(barWidth, minBarWidth);
 	barWidth = Math.min(barWidth, maxBarWidth);
