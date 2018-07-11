@@ -29,6 +29,18 @@ function main() {
 					timeseries : [0,0,2,4,2,6,8,10,0,0,0]
 				},
 				{
+					icon: {class: 'fa fa-male', color: 'green'},
+					count: 28,
+					value: 'Linda',
+					timeseries : [[0,4],[1,2],[2,0],[3,4],[4,2],[5,0],[6,8],[7,8],[8,0],[9,0],[10,0]]
+				},
+				{
+					icon: {class: 'fa fa-male', color: 'blue'},
+					count: 24,
+					value: 'Jenny',
+					timeseries : [[0,0],[2,8],[3,0],[6,4],[7,2],[8,2],[12,8],[14,0],[18,0],[19,0],[22,0]]
+				},
+				{
 					icon: {class: 'fa fa-male', color: 'lightblue'},
 					count: 11,
 					value: 'Debbie',

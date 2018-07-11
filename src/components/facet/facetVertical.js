@@ -31,6 +31,8 @@ var HIGHLIGHT_CLASS = 'facet-icon-highlighted';
 var ABBREVIATED_CLASS = 'facets-facet-vertical-abbreviated';
 var HIDDEN_CLASS = 'facets-facet-vertical-hidden';
 var SELECTED_CLASS = 'facet-bar-selected';
+var TIMESERIES_X_INDEX = 0;
+var TIMESERIES_Y_INDEX = 1;
 
 /**
  * Vertical facet class, standard facet class.
@@ -395,17 +397,43 @@ FacetVertical.prototype._removeHandlers = function() {
  */
 FacetVertical.prototype._renderSparkline = function(width, height, timeseries, maxValue) {
 	var x = 0, y = 0;
-	var dx = width / (timeseries.length-1);
-	var pathData = 'M ';
 	var timeIdx;
-	for (timeIdx = 0; timeIdx < timeseries.length; timeIdx++) {
-		y = height - Math.floor((timeseries[timeIdx])/maxValue * height) + 1;
-		pathData += (x + ' ' + y);
-		if (timeIdx < timeseries.length-1) {
-			pathData += ' L ';
+	var pathData = 'M ';
+
+	if (timeseries.length > 0 && Array.isArray(timeseries[0])) {
+		// each entry is two values, x and y
+
+		var first = timeseries[0];
+		var last = timeseries[timeseries.length - 1];
+		var xrange = last[TIMESERIES_X_INDEX] - first[TIMESERIES_X_INDEX];
+
+		var lastEntry;
+		for (timeIdx = 0; timeIdx < timeseries.length; timeIdx++) {
+			var entry = timeseries[timeIdx];
+			if (lastEntry) {
+				x += width * ((entry[TIMESERIES_X_INDEX] - lastEntry[TIMESERIES_X_INDEX]) / xrange);
+			}
+			y = height - Math.floor((entry[TIMESERIES_Y_INDEX])/maxValue * height) + 1;
+			pathData += (x + ' ' + y);
+			if (timeIdx < timeseries.length-1) {
+				pathData += ' L ';
+			}
+			lastEntry = entry;
 		}
-		x += dx;
+	} else {
+		// each entry is one value, y
+		var dx = width / (timeseries.length-1);
+
+		for (timeIdx = 0; timeIdx < timeseries.length; timeIdx++) {
+			y = height - Math.floor((timeseries[timeIdx])/maxValue * height) + 1;
+			pathData += (x + ' ' + y);
+			if (timeIdx < timeseries.length-1) {
+				pathData += ' L ';
+			}
+			x += dx;
+		}
 	}
+
 	var pathEl = $(document.createElementNS('http://www.w3.org/2000/svg','path'));
 	pathEl.attr('d',pathData);
 	return pathEl;
@@ -429,7 +457,15 @@ FacetVertical.prototype._updateSparkline = function() {
 
 		// Compute the maximum value so total and selected sparklines are the same height
 		var maxValue = 0;
-		this._spec.timeseries.forEach(function(count) { maxValue = Math.max(maxValue,count); });
+		this._spec.timeseries.forEach(function(entry) {
+			var y;
+			if (Array.isArray(entry)) {
+				y = entry[TIMESERIES_Y_INDEX];
+			} else {
+				y = entry;
+			}
+			maxValue = Math.max(maxValue, y);
+		});
 		maxValue = maxValue ? maxValue : 1;	// prevent divide by 0
 
 		var totalSparklinePath = this._renderSparkline(sparkWidth,sparkHeight,this._spec.timeseries, maxValue);
