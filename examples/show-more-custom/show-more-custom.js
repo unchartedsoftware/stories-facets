@@ -98,7 +98,7 @@ function main() {
 		group.more = remaining.length === 4
 			&& [{ label: 'More', class: 'more', clickable: true }]
 			|| [
-				{ label: 'Other ' + remaining.length + '+ |', class: 'other', clickable: false },
+				{ label: 'Other ' + remaining.length + '+', class: 'other', clickable: false },
 				{ label: 'Less', class: 'less', clickable: true },
 				{ label: '|', class: 'seperator', clickable: false },
 				{ label: 'More', class: 'more', clickable: true },
