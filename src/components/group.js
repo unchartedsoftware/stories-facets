@@ -18,6 +18,7 @@ var _ = require('../util/util');
 var IBindable = require('../components/IBindable');
 var Template = require('../templates/group');
 var TemplateMore = require('../templates/group-more');
+var TemplateLess = require('../templates/group-less');
 var FacetVertical = require('../components/facet/facetVertical');
 var FacetHorizontal = require('../components/facet/facetHorizontal');
 var FacetPlaceholder = require('../components/facet/facetPlaceholder');
@@ -65,7 +66,7 @@ function Group(widget, container, groupSpec, options, index) {
 		all: []
 	};
 
-	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, groupSpec.moreTotal);
+	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, groupSpec.moreTotal, groupSpec.less || 0);
 	this._initializeFacets(groupSpec);
 	/* collapsed state */
 	if (groupSpec.collapsed) {
@@ -303,8 +304,8 @@ Group.prototype.append = function (groupSpec) {
 	/* remove event handlers */
 	this._removeHandlers();
 
-	groupSpec.more = groupSpec.more || 0;
 	this._updateMore(groupSpec.more, groupSpec.moreTotal);
+	this._updateLess(groupSpec.less);
 
 	// make sure the group is not collapsed (so the append effect is visible)
 	this.collapsed = false;
@@ -377,14 +378,16 @@ Group.prototype.replace = function(groupSpec) {
 	this._collapsible = groupSpec.collapsible !== undefined ? groupSpec.collapsible : true;
 
 	//reinit
-	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, groupSpec.moreTotal, index);
+	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, groupSpec.moreTotal, groupSpec.less || 0, index);
 
 	// initialize the new facets
 	this._initializeFacets(groupSpec);
 
 	// Update more link
-	groupSpec.more = groupSpec.more || 0;
 	this._updateMore(groupSpec.more, groupSpec.moreTotal);
+
+	// Update less link
+	this._updateLess(groupSpec.less);
 
 	/* collapsed state */
 	if (groupSpec.collapsed) {
@@ -473,10 +476,11 @@ Group.prototype._destroyFacets = function () {
  * @param {string} label - The label to be used for this group.
  * @param {*} more - A value defining the 'more' behaviour of this group.
  * @param {*} moreTotal - A value defining total count of the 'more' behaviour of this group.
+ * @param {*} less - A value defining the 'less' behaviour of this group.
  * @param {number} index - The index of the element to insert at.
  * @private
  */
-Group.prototype._initializeLayout = function (template, label, more, moreTotal, index) {
+Group.prototype._initializeLayout = function (template, label, more, moreTotal, less, index) {
 	this._element = $(template({
 		label: label,
 		more: more,
@@ -494,6 +498,7 @@ Group.prototype._initializeLayout = function (template, label, more, moreTotal, 
 	this._groupContent = this._element.find('.facets-group');
 
 	this._updateMore(more, moreTotal);
+	this._updateLess(less);
 };
 
 /**
@@ -552,6 +557,7 @@ Group.prototype._setupHandlers = function () {
 Group.prototype._addHandlers = function () {
 	this._element.find('.group-expander').on('click.facetsCollapseExpand', this._toggleCollapseExpand.bind(this));
 	this._element.find('.group-more-target').on('click.facetsGroupMore', this._onMore.bind(this));
+	this._element.find('.group-less-target').on('click.facetsGroupLess', this._onLess.bind(this));
 	this._element.find('.group-other-target').on('click.facetsGroupOther', this._onOther.bind(this));
 	this._element.find('.group-header').on('mousedown', this._handleHeaderMouseDown.bind(this));
 	$(document).on('mouseup.group.' + this._key, this._handleHeaderMouseUp.bind(this));
@@ -659,7 +665,8 @@ Group.prototype._getFacet = function (value) {
  * @param {number} moreTotal - The number of extra counts available.
  * @private
  */
-Group.prototype._updateMore = function (more, moreTotal) {
+Group.prototype._updateMore = function (more, moreTotal, less) {
+	more = more || 0;
 	this._moreElement = $(TemplateMore({
 		more: more
 	}));
@@ -668,6 +675,23 @@ Group.prototype._updateMore = function (more, moreTotal) {
 	if (moreTotal !== undefined) {
 		this._moreElement.find('.group-other-bar').css('width', ((moreTotal / this._total) * 100) + '%');
 	}
+};
+
+/**
+ * Updates the 'less' state of this group.
+ * TODO: Use the already created element if possible instead of creating anew one every time.
+ *
+ * @method _updateLess
+ * @param {number||boolean} less - The number of extra facets added or a boolean specifying of there are less elements.
+ * @private
+ */
+Group.prototype._updateLess = function (less) {
+	less = less || 0;
+	this._lessElement = $(TemplateLess({
+		less: less
+	}));
+	var lessContainer = this._element.find('.group-less-container');
+	lessContainer.replaceWith(this._lessElement);
 };
 
 /**
@@ -799,6 +823,21 @@ Group.prototype._onMore = function (evt) {
 	var index = evt.currentTarget.getAttribute('index');
 	index = (index !== null) ? parseInt(index) : null;
 	this.emit('facet-group:more', evt, this._key, index);
+};
+
+/**
+ * Handler function called when the user click on the 'less' link.
+ *
+ * @method _onLess
+ * @param {Event} evt - The event being handled.
+ * @private
+ */
+Group.prototype._onLess = function (evt) {
+	evt.preventDefault();
+	evt.stopPropagation();
+	var index = evt.currentTarget.getAttribute('index');
+	index = (index !== null) ? parseInt(index) : null;
+	this.emit('facet-group:less', evt, this._key, index);
 };
 
 /**
@@ -974,6 +1013,13 @@ Group.prototype._handleHeaderTouchEnd = function (event) {
 Group.prototype._handleTransitionEnd = function (event) {
 	var property = event.originalEvent.propertyName;
 	if (event.target === this._moreElement.get(0) && property === 'opacity') {
+		if (this.collapsed) {
+			this.emit('facet-group:animation:collapse-on', event, this._key);
+		} else {
+			this.emit('facet-group:animation:collapse-off', event, this._key);
+		}
+	}
+	if (event.target === this._lessElement.get(0) && property === 'opacity') {
 		if (this.collapsed) {
 			this.emit('facet-group:animation:collapse-on', event, this._key);
 		} else {

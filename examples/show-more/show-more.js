@@ -14,66 +14,110 @@
  * limitations under the License.
  */
 
+function getRemainingTotal(remaining) {
+	var remainingTotal = 0;
+	remaining.forEach(function(r) {
+		remainingTotal += r.count;
+	});
+	return remainingTotal;
+}
+
 function main() {
     var container = $('#facet-container');
 
-    var groups = getSampleGroups();
 
-    var facets = new Facets(container,groups);
-
-	facets.on('facet-group:other', function (evt, key, value) {
-		console.log('Clicked: ' + key);
-	});
-
-    // Respond to more event, this example demonstrates calling append on the more callback
-    facets.on('facet-group:more', function(evt, key, value) {
-		if (key === 'phone') {
-			facets.append([
-				{
-					label: 'Phone Numbers',
-					key: 'phone',
-					more: 0,
-					facets: [
-						{icon: {class: 'fa fa-phone', color: 'grey'}, count: 11, value: '111 111 1111'},
-						{icon: {class: 'fa fa-phone', color: 'grey'}, count: 22, value: '222 222 2222'},
-						{icon: {class: 'fa fa-phone', color: 'grey'}, count: 33, value: '333 333 3333'},
-						{icon: {class: 'fa fa-phone', color: 'grey'}, count: 44, value: '444 444 4444'},
-						{icon: {class: 'fa fa-phone', color: 'grey'}, count: 55, value: '555 555 5555'}
-					]
-				}
-			]);
-		} else if (key === 'email') {
-			facets.append([
-				{
-					label: 'Email Addresses',
-					key: 'email',
-					more: 0,
-					facets: [
-						{ icon : {class:'fa fa-envelope',color:'green'}, count : 5, value : 'test3@example.com' },
-						{ icon : {class:'fa fa-envelope',color:'green'}, count : 3, value : 'test4@example.com', links : 6 }
-					]
-				}
-			]);
+	var remaining = [
+		{
+			icon : {class:'fa fa-male',color:'pink'},
+			count : 12,
+			value : 'Bubbles'
+		},
+		{
+			icon : {class:'fa fa-male',color:'lightblue'},
+			count : 11,
+			value : 'Debbie'
+		},
+		{
+			icon : {class:'fa fa-male',color:'goldenrod'},
+			count : 8,
+			value : 'Maya'
+		},
+		{
+			icon : {class:'fa fa-male',color:'magenta'},
+			count : 7,
+			value : 'Stephanie'
 		}
+	];
+
+	var group = {
+		label : 'Names',
+		key : 'name',
+		facets : [
+			{
+				icon : {class:'fa fa-male',color:'red'},
+				count : 26,
+				value : 'Mary'
+			},
+			{
+				icon : {class:'fa fa-male',color:'green'},
+				count : 25,
+				value : 'John'
+			},
+			{
+				icon : {class:'fa fa-male',color:'yellow'},
+				count : 21,
+				value : 'Ricky'
+			}
+		],
+		more: remaining.length,
+		moreTotal: getRemainingTotal(remaining),
+		less: 0
+	};
+
+    var facets = new Facets(container, [ group ]);
+
+	// Respond to more event, this example demonstrates calling append on the more callback
+    facets.on('facet-group:more', function(evt, key, value) {
+		var next = remaining.shift();
+		group.facets.push(next);
+		group.more = remaining.length;
+		group.moreTotal = getRemainingTotal(remaining);
+		group.less += 1;
+
+		facets.replaceGroup(group);
 	});
 
-    var $controls = $('<div/>').prependTo('body');
+	facets.on('facet-group:less', function(evt, key, value) {
+		const last = group.facets.pop();
+		remaining.unshift(last);
+		group.more = remaining.length;
+		group.moreTotal = getRemainingTotal(remaining);
+		group.less -= 1;
 
-    // Test appending group data with more where previously there was no more
-    var $append1 = $('<button/>')
-        .text('Append name with more')
-        .click(function() {
-            facets.append([
-                {
-                    label : 'Names',
-                    more : 1,
-                    key : 'name',
-                    facets : [
-                        { icon : {class:'fa fa-male',color:'grey'}, count : 255, value : 'John' }
-                    ]
-                }
-            ]);
-        })
-        .appendTo($controls);
+		facets.replaceGroup(group);
+	});
+
+    // // Respond to more event, this example demonstrates calling append on the more callback
+    // facets.on('facet-group:more', function(evt, key, value) {
+	// 	var next = remaining.shift();
+	// 	added.push(next);
+	// 	facets.append([
+	// 		{
+	// 			label : 'Names',
+	// 			key : 'name',
+	// 			facets: [
+	// 				next
+	// 			],
+	// 			more: remaining.length,
+	// 			moreTotal: getRemainingTotal(remaining),
+	// 			less: added.length
+	// 		}
+	// 	]);
+	// });
+	//
+	// facets.on('facet-group:less', function(evt, key, value) {
+	// 	const next = added.pop();
+	// 	facets.groups.name.removeFacet(next.key);
+	// });
 
 }
