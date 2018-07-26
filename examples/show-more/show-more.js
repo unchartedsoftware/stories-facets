@@ -74,10 +74,10 @@ function main() {
 		less: 0
 	};
 
-    var facets = new Facets(container, [ group ]);
+	var facets = new Facets(container, [ group ]);
 
 	// Respond to more event, this example demonstrates calling append on the more callback
-    facets.on('facet-group:more', function(evt, key, value) {
+	facets.on('facet-group:more', function(evt, key, value) {
 		var next = remaining.shift();
 		group.facets.push(next);
 		group.more = remaining.length;
@@ -96,28 +96,4 @@ function main() {
 
 		facets.replaceGroup(group);
 	});
-
-    // // Respond to more event, this example demonstrates calling append on the more callback
-    // facets.on('facet-group:more', function(evt, key, value) {
-	// 	var next = remaining.shift();
-	// 	added.push(next);
-	// 	facets.append([
-	// 		{
-	// 			label : 'Names',
-	// 			key : 'name',
-	// 			facets: [
-	// 				next
-	// 			],
-	// 			more: remaining.length,
-	// 			moreTotal: getRemainingTotal(remaining),
-	// 			less: added.length
-	// 		}
-	// 	]);
-	// });
-	//
-	// facets.on('facet-group:less', function(evt, key, value) {
-	// 	const next = added.pop();
-	// 	facets.groups.name.removeFacet(next.key);
-	// });
-
 }
