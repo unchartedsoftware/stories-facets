@@ -67,7 +67,8 @@
 		cursor: pointer;
 	}
 
-	.group-more-container {
+	.group-more-container,
+	.group-less-container {
 		transition: height $facet_abbreviation_animation_duration ease,
 					opacity $facet_abbreviation_animation_duration ease;
 		padding: 0px 8px 2px 8px;
@@ -134,7 +135,8 @@
 		float: left;
 	}
 
-	.group-other-label-show-more {
+	.group-other-label-show-more,
+	.group-other-label-show-less, {
 		position: absolute;
 		right: -17px;
 		top: 6px;
@@ -147,7 +149,8 @@
 		cursor: default;
 	}
 
-	.group-more-target {
+	.group-more-target,
+	.group-less-target {
 		cursor: pointer;
 		padding-top: 7px;
 		padding-bottom: 7px;
@@ -191,7 +194,8 @@
 		color: #bbb;
 		margin-right: 2px;
 	}
-	.group-more-container {
+	.group-more-container,
+	.group-less-container {
 		height: 0;
 		opacity: 0;
 	}
