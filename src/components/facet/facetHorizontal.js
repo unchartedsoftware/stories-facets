@@ -234,13 +234,24 @@ FacetHorizontal.prototype.processSpec = function(inData) {
 	histogram.scaleFn = inData.scaleFn;
 	var firstSlice = histogram.slices[0];
 	var lastSlice = histogram.slices[histogram.slices.length - 1];
+
+  var leftRangeLabel = firstSlice.label !== undefined ? firstSlice.label : firstSlice.binStart;
+  var rightRangeLabel = (lastSlice.toLabel || lastSlice.label) !== undefined ? (lastSlice.toLabel || lastSlice.label) : (lastSlice.binEnd || lastSlice.binStart);
+
+  var displayFn = $.isFunction(inData.displayFn) ? inData.displayFn : false;
+  if (displayFn) {
+    leftRangeLabel = displayFn(leftRangeLabel);
+    rightRangeLabel = displayFn(rightRangeLabel);
+  }
+
+
 	var outData = {
 		histogram: histogram,
-		leftRangeLabel: firstSlice.label,
-		rightRangeLabel: lastSlice.toLabel || lastSlice.label,
+		leftRangeLabel: leftRangeLabel,
+		rightRangeLabel: rightRangeLabel,
           filterable: inData.filterable !== undefined ? inData.filterable : true,
-          displayFn: $.isFunction(inData.displayFn) ? inData.displayFn : false
-	};
+          displayFn: displayFn
+        };
 	return outData;
 };
 

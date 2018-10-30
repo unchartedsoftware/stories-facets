@@ -196,7 +196,7 @@ Object.defineProperty(FacetHistogramBar.prototype, 'metadata', {
  */
 Object.defineProperty(FacetHistogramBar.prototype, 'info', {
 	get: function() {
-          return {
+          info = {
 			label: this._metadata.map(function(info) {
 				return info.label || info.binStart;
 			}),
@@ -213,7 +213,21 @@ Object.defineProperty(FacetHistogramBar.prototype, 'info', {
 				return info.metadata;
 			})
 		};
-	}
+
+          if (this._metadata[0].binStart !== undefined) {
+            info.binStart = this._metadata.map(function(info) {
+              return info.binStart;
+            });
+          }
+
+          if (this._metadata[0].binEnd !== undefined) {
+            info.binEnd = this._metadata.map(function(info) {
+              return info.binEnd;
+            });
+          }
+
+          return info;
+        }
 });
 
 /**
