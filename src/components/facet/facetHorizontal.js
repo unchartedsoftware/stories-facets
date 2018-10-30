@@ -184,12 +184,14 @@ FacetHorizontal.prototype.select = function(data) {
 				for (var ii = 0, nn = barMetadata.length; ii < nn; ++ii) {
 					var slice = barMetadata[ii];
 
-					if (fromIsString && (slice.label === from || +slice.label === +from)) {
+                                  binStart = slice.label !== undefined ? slice.label : slice.binStart;
+                                  binEnd = slice.toLabel !== undefined ? slice.toLabel : slice.binEnd;
+					if (fromIsString && (binStart === from || +binStart === +from)) {
 						from = i;
 						fromIsString = false;
 					}
 
-					if (toIsString && (slice.toLabel === to || +slice.toLabel === +to)) {
+					if (toIsString && (binEnd === to || +binEnd === +to)) {
 						to = i;
 						toIsString = false;
 					}
@@ -236,7 +238,8 @@ FacetHorizontal.prototype.processSpec = function(inData) {
 		histogram: histogram,
 		leftRangeLabel: firstSlice.label,
 		rightRangeLabel: lastSlice.toLabel || lastSlice.label,
-		filterable: inData.filterable !== undefined ? inData.filterable : true
+          filterable: inData.filterable !== undefined ? inData.filterable : true,
+          displayFn: $.isFunction(inData.displayFn) ? inData.displayFn : false
 	};
 	return outData;
 };
@@ -335,7 +338,11 @@ FacetHorizontal.prototype._initializeLayout = function(template) {
 	this._svg = this._element.find('svg');
 
 	this._histogram = new Histogram(this._svg, this._spec.histogram);
-	this._histogramFilter = new HistogramFilter(this._element, this._histogram);
+
+  var spec = {
+    displayFn: this._spec.displayFn
+  };
+	this._histogramFilter = new HistogramFilter(this._element, this._histogram, spec);
 	this._histogramFilter.setFilterPixelRange({ from: 0, to: this._histogram.totalWidth });
 
 	this._rangeControls = this._element.find('.facet-range-controls');
@@ -389,7 +396,16 @@ FacetHorizontal.prototype._removeHandlers = function() {
  * @private
  */
 FacetHorizontal.prototype._onMouseEventBar = function (type, bar, event) {
-	this.emit(type, event, this._key, bar.info);
+  var info = bar.info;
+  this._formatLabels(info);
+  this.emit(type, event, this._key, info);
+};
+
+FacetHorizontal.prototype._formatLabels = function (barInfo) {
+  if (this._spec.displayFn) {
+    barInfo.label = barInfo.label.map(this._spec.displayFn);
+    barInfo.toLabel = barInfo.toLabel.map(this._spec.displayFn);
+  }
 };
 
 /**

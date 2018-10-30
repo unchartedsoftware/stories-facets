@@ -196,13 +196,13 @@ Object.defineProperty(FacetHistogramBar.prototype, 'metadata', {
  */
 Object.defineProperty(FacetHistogramBar.prototype, 'info', {
 	get: function() {
-		return {
+          return {
 			label: this._metadata.map(function(info) {
-				return info.label;
+				return info.label || info.binStart;
 			}),
 
 			toLabel: this._metadata.map(function(info) {
-				return info.toLabel;
+				return info.toLabel || info.binEnd;
 			}),
 
 			count: this._metadata.map(function(info) {

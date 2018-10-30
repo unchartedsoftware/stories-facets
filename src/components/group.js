@@ -325,7 +325,7 @@ Group.prototype.append = function (groupSpec) {
 			facetSpec.count += existingFacet.count;
 			existingFacet.updateSpec(facetSpec);
 		} else {
-			var facet = this._createNewFacet(facetSpec, groupSpec.key, true);
+			var facet = this._createNewFacet(facetSpec, groupSpec.key, true, groupSpec.displayFn);
 			if (facet instanceof FacetHorizontal) {
 				this.horizontalFacets.push(facet);
 			} else {
@@ -525,7 +525,7 @@ Group.prototype._initializeFacets = function (spec) {
 	var facets = spec.facets;
 	for (var i = 0, n = facets.length; i < n; ++i) {
 		var facetSpec = facets[i];
-		var facet = this._createNewFacet(facetSpec, spec.key);
+		var facet = this._createNewFacet(facetSpec, spec.key, false, spec.displayFn);
 		if (facet instanceof FacetHorizontal) {
 			this.horizontalFacets.push(facet);
 		} else {
@@ -701,14 +701,16 @@ Group.prototype._updateLess = function (less) {
  * @param {Object} facetSpec - Data specification for the facet to create.
  * @param {string} groupKey - The group key to create the facet with.
  * @param {boolean=} hidden - Specifies if the newly created facet should be created hidden.
+ * @param {Function} displayFn - Specify a function to be used to transform values to display values.
  * @private
  */
-Group.prototype._createNewFacet = function (facetSpec, groupKey, hidden) {
+Group.prototype._createNewFacet = function (facetSpec, groupKey, hidden, displayFn) {
 	if ('histogram' in facetSpec) {
 		// create a horizontal facet
 		return new FacetHorizontal(this._facetContainer, this, _.extend(facetSpec, {
 			key: groupKey,
-			hidden: hidden
+                  hidden: hidden,
+                  displayFn: displayFn
 		}));
 	} else if ('placeholder' in facetSpec) {
 		// create a placeholder facet
