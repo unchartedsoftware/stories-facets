@@ -196,13 +196,13 @@ Object.defineProperty(FacetHistogramBar.prototype, 'metadata', {
  */
 Object.defineProperty(FacetHistogramBar.prototype, 'info', {
 	get: function() {
-		return {
+          info = {
 			label: this._metadata.map(function(info) {
-				return info.label;
+				return info.label || info.binStart;
 			}),
 
 			toLabel: this._metadata.map(function(info) {
-				return info.toLabel;
+				return info.toLabel || info.binEnd;
 			}),
 
 			count: this._metadata.map(function(info) {
@@ -213,7 +213,21 @@ Object.defineProperty(FacetHistogramBar.prototype, 'info', {
 				return info.metadata;
 			})
 		};
-	}
+
+          if (this._metadata[0].binStart !== undefined) {
+            info.binStart = this._metadata.map(function(info) {
+              return info.binStart;
+            });
+          }
+
+          if (this._metadata[0].binEnd !== undefined) {
+            info.binEnd = this._metadata.map(function(info) {
+              return info.binEnd;
+            });
+          }
+
+          return info;
+        }
 });
 
 /**

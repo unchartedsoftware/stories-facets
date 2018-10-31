@@ -36,6 +36,7 @@ function FacetHistogram (svgContainer, spec) {
 	this._bars = [];
 	this._maxBarHeight = 0;
 	this._showOrigin = ('showOrigin' in spec) ? spec.showOrigin : false;
+  this._displayFn = $.isFunction(spec.displayFn) ? spec.displayFn : false;
 
 	this.initializeSlices(svgContainer, spec.slices);
 }
@@ -275,8 +276,9 @@ FacetHistogram.prototype.select = function (slices) {
                 var count = 0;
 		for (var ii = 0, nn = barMetadata.length; ii < nn; ++ii) {
 			var slice = barMetadata[ii];
-			if (slice.label in slices) {
-				count += slices[slice.label];
+                        var key = slice.label !== undefined ? slice.label : slice.binStart;
+			if (key in slices) {
+				count += slices[key];
 			}
 
                 }
