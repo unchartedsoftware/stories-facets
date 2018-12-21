@@ -325,7 +325,7 @@ Group.prototype.append = function (groupSpec) {
 			facetSpec.count += existingFacet.count;
 			existingFacet.updateSpec(facetSpec);
 		} else {
-			var facet = this._createNewFacet(facetSpec, groupSpec.key, true, groupSpec.displayFn);
+			var facet = this._createNewFacet(facetSpec, groupSpec.key, true, groupSpec.displayFn, groupSpec.alwaysHighlight);
 			if (facet instanceof FacetHorizontal) {
 				this.horizontalFacets.push(facet);
 			} else {
@@ -525,7 +525,7 @@ Group.prototype._initializeFacets = function (spec) {
 	var facets = spec.facets;
 	for (var i = 0, n = facets.length; i < n; ++i) {
 		var facetSpec = facets[i];
-		var facet = this._createNewFacet(facetSpec, spec.key, false, spec.displayFn);
+		var facet = this._createNewFacet(facetSpec, spec.key, false, spec.displayFn, spec.alwaysHighlight);
 		if (facet instanceof FacetHorizontal) {
 			this.horizontalFacets.push(facet);
 		} else {
@@ -704,13 +704,14 @@ Group.prototype._updateLess = function (less) {
  * @param {Function} displayFn - Specify a function to be used to transform values to display values.
  * @private
  */
-Group.prototype._createNewFacet = function (facetSpec, groupKey, hidden, displayFn) {
+Group.prototype._createNewFacet = function (facetSpec, groupKey, hidden, displayFn, alwaysHighlight) {
 	if ('histogram' in facetSpec) {
 		// create a horizontal facet
 		return new FacetHorizontal(this._facetContainer, this, _.extend(facetSpec, {
 			key: groupKey,
                   hidden: hidden,
-                  displayFn: displayFn
+                  displayFn: displayFn,
+                  alwaysHighlight: alwaysHighlight || false
 		}));
 	} else if ('placeholder' in facetSpec) {
 		// create a placeholder facet
