@@ -239,7 +239,7 @@ FacetHistogram.prototype.barRangeToPixelRange = function (barRange) {
 FacetHistogram.prototype.highlightRange = function (range) {
 	var bars = this._bars;
 	for (var i = 0, n = bars.length; i < n; ++i) {
-		bars[i].highlighted = (i >= range.from && i <= range.to);
+          bars[i].highlighted = this._spec.alwaysHighlight || (i >= range.from && i <= range.to);
 	}
 };
 

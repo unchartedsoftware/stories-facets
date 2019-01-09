@@ -232,6 +232,7 @@ FacetHorizontal.prototype.deselect = function() {
 FacetHorizontal.prototype.processSpec = function(inData) {
 	var histogram = this.processHistogram(inData.histogram);
 	histogram.scaleFn = inData.scaleFn;
+        histogram.alwaysHighlight = inData.alwaysHighlight;
 	var firstSlice = histogram.slices[0];
 	var lastSlice = histogram.slices[histogram.slices.length - 1];
 
