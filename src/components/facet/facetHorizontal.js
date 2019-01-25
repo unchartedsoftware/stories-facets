@@ -184,8 +184,9 @@ FacetHorizontal.prototype.select = function(data) {
 				for (var ii = 0, nn = barMetadata.length; ii < nn; ++ii) {
 					var slice = barMetadata[ii];
 
-                                  binStart = slice.label !== undefined ? slice.label : slice.binStart;
-                                  binEnd = slice.toLabel !== undefined ? slice.toLabel : slice.binEnd;
+					binStart = slice.label !== undefined ? slice.label : slice.binStart;
+					binEnd = slice.toLabel !== undefined ? slice.toLabel : slice.binEnd;
+
 					if (fromIsString && (binStart === from || +binStart === +from)) {
 						from = i;
 						fromIsString = false;
@@ -232,27 +233,26 @@ FacetHorizontal.prototype.deselect = function() {
 FacetHorizontal.prototype.processSpec = function(inData) {
 	var histogram = this.processHistogram(inData.histogram);
 	histogram.scaleFn = inData.scaleFn;
-        histogram.alwaysHighlight = inData.alwaysHighlight;
+	histogram.alwaysHighlight = inData.alwaysHighlight;
 	var firstSlice = histogram.slices[0];
 	var lastSlice = histogram.slices[histogram.slices.length - 1];
 
-  var leftRangeLabel = firstSlice.label !== undefined ? firstSlice.label : firstSlice.binStart;
-  var rightRangeLabel = (lastSlice.toLabel || lastSlice.label) !== undefined ? (lastSlice.toLabel || lastSlice.label) : (lastSlice.binEnd || lastSlice.binStart);
+	var leftRangeLabel = firstSlice.label !== undefined ? firstSlice.label : firstSlice.binStart;
+	var rightRangeLabel = (lastSlice.toLabel !== undefined || lastSlice.label !== undefined) ? (lastSlice.toLabel || lastSlice.label) : (lastSlice.binEnd || lastSlice.binStart);
 
-  var displayFn = $.isFunction(inData.displayFn) ? inData.displayFn : false;
-  if (displayFn) {
-    leftRangeLabel = displayFn(leftRangeLabel);
-    rightRangeLabel = displayFn(rightRangeLabel);
-  }
-
+	var displayFn = $.isFunction(inData.displayFn) ? inData.displayFn : false;
+	if (displayFn) {
+		leftRangeLabel = displayFn(leftRangeLabel);
+		rightRangeLabel = displayFn(rightRangeLabel);
+	}
 
 	var outData = {
 		histogram: histogram,
 		leftRangeLabel: leftRangeLabel,
 		rightRangeLabel: rightRangeLabel,
-          filterable: inData.filterable !== undefined ? inData.filterable : true,
-          displayFn: displayFn
-        };
+		filterable: inData.filterable !== undefined ? inData.filterable : true,
+		displayFn: displayFn
+	};
 	return outData;
 };
 

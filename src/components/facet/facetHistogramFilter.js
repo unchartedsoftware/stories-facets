@@ -316,16 +316,19 @@ FacetHistogramFilter.prototype.updateUI = function (barRange, pixelRange) {
 	var bars = this._histogram.bars;
 	var leftBarMetadata = bars[barRange.from].metadata;
 	var rightBarMetadata = bars[barRange.to].metadata;
-        var fromLabel = leftBarMetadata[0].binStart;
-        var toLabel = rightBarMetadata[rightBarMetadata.length - 1].binEnd;
 
-  if (this._spec) {
-    var displayFn = this._spec.displayFn;
-    if ($.isFunction(displayFn)) {
-      fromLabel = displayFn(fromLabel);
-      toLabel = displayFn(toLabel);
-    }
-  }
+	var firstMetadata = leftBarMetadata[0];
+	var lastMetadata = rightBarMetadata[rightBarMetadata.length - 1];
+
+	var fromLabel = firstMetadata.label;
+	var toLabel = lastMetadata.toLabel;
+
+	var displayFn = this._spec ? this._spec.displayFn : false;
+	if ($.isFunction(displayFn)) {
+		fromLabel = this._spec.displayFn(firstMetadata.binStart);
+		toLabel = this._spec.displayFn(lastMetadata.binEnd);
+	}
+
 	this._currentRangeLabel.text(fromLabel + ' - ' + toLabel);
 
 	this._histogram.highlightRange(barRange);
@@ -357,5 +360,3 @@ FacetHistogramFilter.prototype.updateUI = function (barRange, pixelRange) {
  * @type {FacetHistogramFilter}
  */
 module.exports = FacetHistogramFilter;
-
-
