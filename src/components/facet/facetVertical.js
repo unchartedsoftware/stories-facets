@@ -576,7 +576,7 @@ FacetVertical.prototype._update = function() {
  * @private
  */
 FacetVertical.prototype._onClick = function(evt) {
-	this.emit(this._type + ':click', evt, this._key, this._value, this._count);
+	this.emit(this._type + ':click', evt, this._key, this._value, this._count, this);
 };
 
 /**
@@ -587,7 +587,7 @@ FacetVertical.prototype._onClick = function(evt) {
  */
 FacetVertical.prototype._onSearch = function(evt) {
 	evt.stopPropagation();
-	this.emit(this._type + ':search', evt, this._key, this._value, this._count);
+	this.emit(this._type + ':search', evt, this._key, this._value, this._count, this);
 };
 
 /**
@@ -598,7 +598,7 @@ FacetVertical.prototype._onSearch = function(evt) {
  */
 FacetVertical.prototype._onLink = function(evt) {
 	evt.stopPropagation();
-	this.emit(this._type + ':link', evt, this._key, this._value, this._count);
+	this.emit(this._type + ':link', evt, this._key, this._value, this._count, this);
 };
 
 /**
@@ -609,7 +609,7 @@ FacetVertical.prototype._onLink = function(evt) {
  */
 FacetVertical.prototype._onClose = function(evt) {
 	evt.stopPropagation();
-	this.emit(this._type + ':close', evt, this._key, this._value, this._count);
+	this.emit(this._type + ':close', evt, this._key, this._value, this._count, this);
 };
 
 /**
@@ -619,7 +619,7 @@ FacetVertical.prototype._onClose = function(evt) {
  * @private
  */
 FacetVertical.prototype._onMouseEnter = function(evt) {
-	this.emit(this._type + ':mouseenter', evt, this._key, this._value, this._count);
+	this.emit(this._type + ':mouseenter', evt, this._key, this._value, this._count, this);
 };
 
 /**
@@ -629,7 +629,7 @@ FacetVertical.prototype._onMouseEnter = function(evt) {
  * @private
  */
 FacetVertical.prototype._onMouseLeave = function(evt) {
-	this.emit(this._type + ':mouseleave', evt, this._key, this._value, this._count);
+	this.emit(this._type + ':mouseleave', evt, this._key, this._value, this._count, this);
 };
 
 /**
@@ -643,24 +643,24 @@ FacetVertical.prototype._handleTransitionEnd = function(evt) {
 	var property = evt.originalEvent.propertyName;
 	if (evt.target === this._element.get(0) && property === 'opacity') {
 		if (this.visible) {
-			this.emit(this._type + ':animation:visible-on', evt, this._key, this._value, this._count);
+			this.emit(this._type + ':animation:visible-on', evt, this._key, this._value, this._count, this);
 		} else {
-			this.emit(this._type + ':animation:visible-off', evt, this._key, this._value, this._count);
+			this.emit(this._type + ':animation:visible-off', evt, this._key, this._value, this._count, this);
 		}
 	} else if (evt.target === this._iconContainer.get(0) && property === 'opacity') {
 		if (this.abbreviated) {
-			this.emit(this._type + ':animation:abbreviated-on', evt, this._key, this._value, this._count);
+			this.emit(this._type + ':animation:abbreviated-on', evt, this._key, this._value, this._count, this);
 		} else {
-			this.emit(this._type + ':animation:abbreviated-off', evt, this._key, this._value, this._count);
+			this.emit(this._type + ':animation:abbreviated-off', evt, this._key, this._value, this._count, this);
 		}
 	} else if (evt.target === this._barBackground.get(0) && property === 'width') {
-		this.emit(this._type + ':animation:bar-width-change', evt, this._key, this._value, this._count);
+		this.emit(this._type + ':animation:bar-width-change', evt, this._key, this._value, this._count, this);
 	} else if (evt.target === this._barForeground.get(0) && property === 'width') {
 		if (!this._hasEmittedSelectedEvent && this._barForeground.hasClass(SELECTED_CLASS)) {
-			this.emit(this._type + ':animation:selected-on', evt, this._key, this._value, this._count);
+			this.emit(this._type + ':animation:selected-on', evt, this._key, this._value, this._count, this);
 			this._hasEmittedSelectedEvent = true;
 		} else if (this._hasEmittedSelectedEvent && !this._barForeground.hasClass(SELECTED_CLASS)) {
-			this.emit(this._type + ':animation:selected-off', evt, this._key, this._value, this._count);
+			this.emit(this._type + ':animation:selected-off', evt, this._key, this._value, this._count, this);
 			this._hasEmittedSelectedEvent = false;
 		}
 	}

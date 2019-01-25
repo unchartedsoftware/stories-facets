@@ -205,7 +205,7 @@ FacetPlaceholder.prototype._removeHandlers = function() {
  * @private
  */
 FacetPlaceholder.prototype._onClick = function(evt) {
-	this.emit(this._type + ':click', evt, this._key);
+	this.emit(this._type + ':click', evt, this._key, this);
 };
 
 /**
@@ -215,7 +215,7 @@ FacetPlaceholder.prototype._onClick = function(evt) {
  * @private
  */
 FacetPlaceholder.prototype._onMouseEnter = function(evt) {
-	this.emit(this._type + ':mouseenter', evt, this._key);
+	this.emit(this._type + ':mouseenter', evt, this._key, this);
 };
 
 /**
@@ -225,7 +225,7 @@ FacetPlaceholder.prototype._onMouseEnter = function(evt) {
  * @private
  */
 FacetPlaceholder.prototype._onMouseLeave = function(evt) {
-	this.emit(this._type + ':mouseleave', evt, this._key);
+	this.emit(this._type + ':mouseleave', evt, this._key, this);
 };
 
 /**

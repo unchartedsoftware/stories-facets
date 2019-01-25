@@ -410,7 +410,7 @@ FacetHorizontal.prototype._removeHandlers = function() {
 FacetHorizontal.prototype._onMouseEventBar = function (type, bar, event) {
   var info = bar.info;
   this._formatLabels(info);
-  this.emit(type, event, this._key, info);
+  this.emit(type, event, this._key, info, this);
 };
 
 FacetHorizontal.prototype._formatLabels = function (barInfo) {
@@ -429,7 +429,7 @@ FacetHorizontal.prototype._formatLabels = function (barInfo) {
  */
 FacetHorizontal.prototype._onFilterChanged = function (newBarRange, fromUserInput) {
 	var event = 'facet-histogram:rangechanged' + (fromUserInput ? 'user' : '');
-	this.emit(event, null, this._key, this.filterRange);
+	this.emit(event, null, this._key, this.filterRange, this);
 };
 
 /**
@@ -442,15 +442,15 @@ FacetHorizontal.prototype._handleTransitionEnd = function(evt) {
 	var property = evt.originalEvent.propertyName;
 	if (evt.target === this._element.get(0) && property === 'opacity') {
 		if (this.visible) {
-			this.emit('facet-histogram:animation:visible-on', evt, this._key);
+			this.emit('facet-histogram:animation:visible-on', evt, this._key, this);
 		} else {
-			this.emit('facet-histogram:animation:visible-off', evt, this._key);
+			this.emit('facet-histogram:animation:visible-off', evt, this._key, this);
 		}
 	} else if (evt.target === this._rangeControls.get(0) && property === 'opacity') {
 		if (this.abbreviated) {
-			this.emit('facet-histogram:animation:abbreviated-on', evt, this._key);
+			this.emit('facet-histogram:animation:abbreviated-on', evt, this._key, this);
 		} else {
-			this.emit('facet-histogram:animation:abbreviated-off', evt, this._key);
+			this.emit('facet-histogram:animation:abbreviated-off', evt, this._key, this);
 		}
 	}
 };
