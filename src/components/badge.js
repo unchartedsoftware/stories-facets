@@ -132,7 +132,7 @@ Badge.prototype.destroy = function() {
  */
 Badge.prototype._onClose = function(evt) {
 	evt.stopPropagation();
-	this.emit('badge:close', evt, this._key, this._value);
+	this.emit('badge:close', evt, this._key, this._value, this);
 };
 
 /**
