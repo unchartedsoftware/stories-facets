@@ -181,7 +181,7 @@ Object.defineProperty(Group.prototype, 'index', {
 	set: function (value) {
 		if (value !== this._index) {
 			this._index = value;
-			this.emit('facet-group:reordered', null, this._key, this._index);
+			this.emit('facet-group:reordered', null, this._key, this._index, this);
 		}
 	}
 });
@@ -325,7 +325,7 @@ Group.prototype.append = function (groupSpec) {
 			facetSpec.count += existingFacet.count;
 			existingFacet.updateSpec(facetSpec);
 		} else {
-			var facet = this._createNewFacet(facetSpec, groupSpec.key, true);
+			var facet = this._createNewFacet(facetSpec, groupSpec.key, true, groupSpec.displayFn, groupSpec.alwaysHighlight);
 			if (facet instanceof FacetHorizontal) {
 				this.horizontalFacets.push(facet);
 			} else {
@@ -525,7 +525,7 @@ Group.prototype._initializeFacets = function (spec) {
 	var facets = spec.facets;
 	for (var i = 0, n = facets.length; i < n; ++i) {
 		var facetSpec = facets[i];
-		var facet = this._createNewFacet(facetSpec, spec.key);
+		var facet = this._createNewFacet(facetSpec, spec.key, false, spec.displayFn, spec.alwaysHighlight);
 		if (facet instanceof FacetHorizontal) {
 			this.horizontalFacets.push(facet);
 		} else {
@@ -701,14 +701,17 @@ Group.prototype._updateLess = function (less) {
  * @param {Object} facetSpec - Data specification for the facet to create.
  * @param {string} groupKey - The group key to create the facet with.
  * @param {boolean=} hidden - Specifies if the newly created facet should be created hidden.
+ * @param {Function} displayFn - Specify a function to be used to transform values to display values.
  * @private
  */
-Group.prototype._createNewFacet = function (facetSpec, groupKey, hidden) {
+Group.prototype._createNewFacet = function (facetSpec, groupKey, hidden, displayFn, alwaysHighlight) {
 	if ('histogram' in facetSpec) {
 		// create a horizontal facet
 		return new FacetHorizontal(this._facetContainer, this, _.extend(facetSpec, {
 			key: groupKey,
-			hidden: hidden
+                  hidden: hidden,
+                  displayFn: displayFn,
+                  alwaysHighlight: alwaysHighlight || false
 		}));
 	} else if ('placeholder' in facetSpec) {
 		// create a placeholder facet
@@ -743,9 +746,9 @@ Group.prototype._toggleCollapseExpand = function (evt) {
 
 	this.collapsed = !this.collapsed;
 	if (this.collapsed) {
-		this.emit('facet-group:collapse', evt, this._key);
+		this.emit('facet-group:collapse', evt, this._key, this);
 	} else {
-		this.emit('facet-group:expand', evt, this._key);
+		this.emit('facet-group:expand', evt, this._key, this);
 	}
 
 	return false;
@@ -822,7 +825,7 @@ Group.prototype._onMore = function (evt) {
 	evt.stopPropagation();
 	var index = evt.currentTarget.getAttribute('index');
 	index = (index !== null) ? parseInt(index) : null;
-	this.emit('facet-group:more', evt, this._key, index);
+	this.emit('facet-group:more', evt, this._key, index, this);
 };
 
 /**
@@ -837,7 +840,7 @@ Group.prototype._onLess = function (evt) {
 	evt.stopPropagation();
 	var index = evt.currentTarget.getAttribute('index');
 	index = (index !== null) ? parseInt(index) : null;
-	this.emit('facet-group:less', evt, this._key, index);
+	this.emit('facet-group:less', evt, this._key, index, this);
 };
 
 /**
@@ -850,7 +853,7 @@ Group.prototype._onLess = function (evt) {
 Group.prototype._onOther = function (evt) {
 	evt.preventDefault();
 	evt.stopPropagation();
-	this.emit('facet-group:other', evt, this._key);
+	this.emit('facet-group:other', evt, this._key, this);
 };
 
 /**
@@ -891,7 +894,7 @@ Group.prototype._handleHeaderMouseUp = function (evt) {
 		/* reset position */
 		this._groupContent.removeAttr('style');
 		/* trigger dragging end event */
-		this.emit('facet-group:dragging:end', evt, this._key);
+		this.emit('facet-group:dragging:end', evt, this._key, this);
 
 		return false;
 	}
@@ -1000,7 +1003,7 @@ Group.prototype._handleHeaderTouchEnd = function (event) {
 		/* reset position */
 		this._groupContent.removeAttr('style');
 		/* trigger dragging end event */
-		this.emit('facet-group:dragging:end', event, this._key);
+		this.emit('facet-group:dragging:end', event, this._key, this);
 	}
 };
 
@@ -1014,16 +1017,16 @@ Group.prototype._handleTransitionEnd = function (event) {
 	var property = event.originalEvent.propertyName;
 	if (event.target === this._moreElement.get(0) && property === 'opacity') {
 		if (this.collapsed) {
-			this.emit('facet-group:animation:collapse-on', event, this._key);
+			this.emit('facet-group:animation:collapse-on', event, this._key, this);
 		} else {
-			this.emit('facet-group:animation:collapse-off', event, this._key);
+			this.emit('facet-group:animation:collapse-off', event, this._key, this);
 		}
 	}
 	if (event.target === this._lessElement.get(0) && property === 'opacity') {
 		if (this.collapsed) {
-			this.emit('facet-group:animation:collapse-on', event, this._key);
+			this.emit('facet-group:animation:collapse-on', event, this._key, this);
 		} else {
-			this.emit('facet-group:animation:collapse-off', event, this._key);
+			this.emit('facet-group:animation:collapse-off', event, this._key, this);
 		}
 	}
 };
@@ -1045,7 +1048,7 @@ Group.prototype._startDragging = function (event) {
 			left: 0,
 			'z-index': 999
 		});
-		this.emit('facet-group:dragging:start', event, this._key);
+		this.emit('facet-group:dragging:start', event, this._key, this);
 	}
 };
 
@@ -1125,7 +1128,7 @@ Group.prototype._performDragging = function (event) {
 	});
 
 	/* trigger the drag move event */
-	this.emit('facet-group:dragging:move', event, this._key);
+	this.emit('facet-group:dragging:move', event, this._key, this);
 };
 
 /**

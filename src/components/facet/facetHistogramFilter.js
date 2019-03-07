@@ -21,9 +21,10 @@
  * @class FacetHistogramFilter
  * @param {jQuery} element - A jQuery wrapped element that contains all the range manipulation tools.
  * @param {FacetHistogram} histogram - The histogram to which the tools will be linked to.
+ * @param {Object} spec - a spec for the filter
  * @constructor
  */
-function FacetHistogramFilter (element, histogram) {
+function FacetHistogramFilter (element, histogram, spec) {
 	this._element = element;
 	this._histogram = histogram;
 	this._rangeFilter = element.find('.facet-range-filter');
@@ -58,6 +59,10 @@ function FacetHistogramFilter (element, histogram) {
 	};
 
 	this._onFilterChanged = null;
+
+  if (spec !== undefined) {
+        this._spec = spec;
+  }
 
 	this._initializeDragging();
 	this._initializePagination();
@@ -311,7 +316,20 @@ FacetHistogramFilter.prototype.updateUI = function (barRange, pixelRange) {
 	var bars = this._histogram.bars;
 	var leftBarMetadata = bars[barRange.from].metadata;
 	var rightBarMetadata = bars[barRange.to].metadata;
-	this._currentRangeLabel.text(leftBarMetadata[0].label + ' - ' + rightBarMetadata[rightBarMetadata.length - 1].toLabel);
+
+	var firstMetadata = leftBarMetadata[0];
+	var lastMetadata = rightBarMetadata[rightBarMetadata.length - 1];
+
+	var fromLabel = firstMetadata.label;
+	var toLabel = lastMetadata.toLabel;
+
+	var displayFn = this._spec ? this._spec.displayFn : false;
+	if ($.isFunction(displayFn)) {
+		fromLabel = this._spec.displayFn(firstMetadata.binStart);
+		toLabel = this._spec.displayFn(lastMetadata.binEnd);
+	}
+
+	this._currentRangeLabel.text(fromLabel + ' - ' + toLabel);
 
 	this._histogram.highlightRange(barRange);
 
@@ -342,5 +360,3 @@ FacetHistogramFilter.prototype.updateUI = function (barRange, pixelRange) {
  * @type {FacetHistogramFilter}
  */
 module.exports = FacetHistogramFilter;
-
-
