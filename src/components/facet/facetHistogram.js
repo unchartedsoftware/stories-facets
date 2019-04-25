@@ -272,26 +272,25 @@ FacetHistogram.prototype.select = function (slices) {
 	for (var i = 0, n = bars.length; i < n; ++i) {
 		var bar = bars[i];
 		var barMetadata = bar.metadata;
-                var count = 0;
+		var count = 0;
 		for (var ii = 0, nn = barMetadata.length; ii < nn; ++ii) {
 			var slice = barMetadata[ii];
-                        var key = slice.label !== undefined ? slice.label : slice.binStart;
+			var key = slice.label !== undefined ? slice.label : slice.binStart;
 			if (key in slices) {
 				count += slices[key];
 			}
+		}
 
-                }
+		if (this._scaleFn) {
+			count = this._scaleFn(count);
+		}
 
-                if(this._scaleFn) {
-                        count = this._scaleFn(count);
-                }
-
-                var newHeight = Math.ceil(svgHeight * (count / yMax));
-                if (bar.selectedHeight === null) {
-                        bar.selectedHeight = newHeight;
-                } else {
-                        bar.selectedHeight = Math.max(bar.selectedHeight, newHeight);
-                }
+		var newHeight = Math.ceil(svgHeight * (count / yMax));
+		if (bar.selectedHeight === null) {
+			bar.selectedHeight = newHeight;
+		} else {
+			bar.selectedHeight = Math.max(bar.selectedHeight, newHeight);
+		}
 	}
 };
 

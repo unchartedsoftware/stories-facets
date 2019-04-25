@@ -165,26 +165,26 @@ Object.defineProperty(FacetHorizontal.prototype, 'filterRange', {
 				}
 			};
 
-		} else if (this._timeseries) {
+		} else if (this._sparkline) {
 
 			pointRange = this._sparklineFilter.pointRange;
 			pixelRange = this._sparklineFilter.pixelRange;
-			fromInfo = this._sparkline.bars[pointRange.from].info;
-			toInfo = this._sparkline.bars[pointRange.to].info;
+			fromInfo = this._sparkline.points[pointRange.from];
+			toInfo = this._sparkline.points[pointRange.to];
 
 			return {
 				from: {
 					index: pointRange.from,
 					pixel: pixelRange.from,
-					label: fromInfo.label,
-					count: fromInfo.count,
+					label: [fromInfo.x],
+					count: [fromInfo.y],
 					metadata: fromInfo.metadata
 				},
 				to: {
 					index: pointRange.to,
 					pixel: pixelRange.to,
-					label: toInfo.toLabel,
-					count: toInfo.count,
+					label: [toInfo.x],
+					count: [toInfo.y],
 					metadata: toInfo.metadata
 				}
 			};
@@ -203,20 +203,24 @@ Object.defineProperty(FacetHorizontal.prototype, 'filterRange', {
  */
 FacetHorizontal.prototype.select = function(data) {
 
+	var selectionData, from, to, fromIsString, toIsString, i, n;
+
 	if (this._histogram) {
 
 		if (data && 'selection' in data) {
-			var selectionData = data.selection;
+			selectionData = data.selection;
 
 			if ('range' in selectionData) {
-				var from = selectionData.range.from;
-				var to = selectionData.range.to;
+				from = selectionData.range.from;
+				to = selectionData.range.to;
 
-				var fromIsString = (typeof from === 'string' || (typeof from === 'object' && from.constructor === String));
-				var toIsString = (typeof to === 'string' || (typeof to === 'object' && to.constructor === String));
+				// string arguments are labels, number arguments are bin indices
+
+				fromIsString = (typeof from === 'string' || (typeof from === 'object' && from.constructor === String));
+				toIsString = (typeof to === 'string' || (typeof to === 'object' && to.constructor === String));
 
 				var bars = this._histogram.bars;
-				for (var i = 0, n = bars.length; i < n && (fromIsString || toIsString); ++i) {
+				for (i = 0, n = bars.length; i < n && (fromIsString || toIsString); ++i) {
 					var barMetadata = bars[i].metadata;
 
 					for (var ii = 0, nn = barMetadata.length; ii < nn; ++ii) {
@@ -250,7 +254,47 @@ FacetHorizontal.prototype.select = function(data) {
 			}
 		}
 
-	} else if (this._timeseries) {
+	} else if (this._sparkline) {
+
+		if (data && 'selection' in data) {
+			selectionData = data.selection;
+
+			if ('range' in selectionData) {
+				from = selectionData.range.from;
+				to = selectionData.range.to;
+
+				// string arguments are labels, number arguments are bin indices
+
+				fromIsString = (typeof from === 'string' || (typeof from === 'object' && from.constructor === String));
+				toIsString = (typeof to === 'string' || (typeof to === 'object' && to.constructor === String));
+
+				var points = this._sparkline.points;
+				for (i = 0, n = points.length; i < n && (fromIsString || toIsString); ++i) {
+					var x = points[i].x;
+
+					if (fromIsString && (x === from || +x === +from)) {
+						from = i;
+						fromIsString = false;
+					}
+
+					if (toIsString && (x === to || +x === +to)) {
+						to = i;
+						toIsString = false;
+					}
+				}
+
+				if (!fromIsString && !toIsString) {
+					this._sparklineFilter.setFilterPointRange({from: from, to: to});
+				}
+			} else {
+				this._sparklineFilter.setFilterPixelRange({ from: 0, to: this._sparkline.totalWidth });
+			}
+
+			this._sparkline.deselect();
+			if ('points' in selectionData) {
+				this._sparkline.select(selectionData.points);
+			}
+		}
 
 	}
 
@@ -268,7 +312,7 @@ FacetHorizontal.prototype.deselect = function() {
 		this._histogramFilter.setFilterPixelRange({ from: 0, to: this._histogram.totalWidth });
 		this._histogram.deselect();
 
-	} else if (this._timeseries) {
+	} else if (this._sparkline) {
 
 		this._sparklineFilter.setFilterPixelRange({ from: 0, to: this._sparkline.totalWidth });
 		this._sparkline.deselect();
@@ -364,7 +408,7 @@ FacetHorizontal.prototype.updateSpec = function (spec) {
 
 		this._spec.histogram = this._spec.histogram.concat(spec.histogram);
 
-	} else if (this._timeseries) {
+	} else if (this._sparkline) {
 
 		this._spec.timeseries = this._spec.timeseries.concat(spec.timeseries);
 
@@ -462,7 +506,7 @@ FacetHorizontal.prototype._addHandlers = function() {
 			this._histogramFilter.onFilterChanged = this._onFilterChanged.bind(this);
 		}
 
-	} else if (this._timeseries) {
+	} else if (this._sparkline) {
 
 		// var points = this._sparkline.points;
 		// for (var i = 0, n = bars.length; i < n; ++i) {
@@ -497,7 +541,7 @@ FacetHorizontal.prototype._removeHandlers = function() {
 
 		this._histogramFilter.onFilterChanged = null;
 
-	} else if (this._timeseries) {
+	} else if (this._sparkline) {
 
 		this._sparklineFilter.onFilterChanged = null;
 
