@@ -705,7 +705,7 @@ Group.prototype._updateLess = function (less) {
  * @private
  */
 Group.prototype._createNewFacet = function (facetSpec, groupKey, hidden, displayFn, alwaysHighlight) {
-	if ('histogram' in facetSpec) {
+	if ('histogram' in facetSpec || ('timeseries' in facetSpec && !('value' in facetSpec))) {
 		// create a horizontal facet
 		return new FacetHorizontal(this._facetContainer, this, _.extend(facetSpec, {
 			key: groupKey,
