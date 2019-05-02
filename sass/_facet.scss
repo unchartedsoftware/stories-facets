@@ -306,9 +306,9 @@
 
 	.facet-range-sparkline {
 		position: relative;
-		height: $facet_horizontal_height;
-		margin-left: 26px;
-		margin-right: 26px;
+		height: 25px;
+		margin-left: 10px;
+		margin-right: 10px;
 		margin-top: 5px;
 		padding-top: 1px;
 		position: relative;
@@ -321,6 +321,10 @@
 		margin: 3px 0px;
 		visibility: visible;
 		transition: visibility $facet_abbreviation_animation_duration step-end;
+
+		.facet-range-controls {
+			margin: 5px 2px 5px 2px;
+		}
 
 		.facet-sparkline {
 			width: 100%;
