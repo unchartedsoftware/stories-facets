@@ -325,6 +325,7 @@
 		.facet-sparkline {
 			width: 100%;
 			height: 100%;
+			transition: $facet_abbreviation_animation_duration ease;
 
 			path {
 				fill: transparent;
@@ -537,6 +538,16 @@
 	.facet-range-filter {
 		transition: opacity $facet_bar_color_animation_duration ease;
 		opacity: 0;
+	}
+
+	.facet-sparkline {
+		transition: opacity $facet_bar_color_animation_duration ease;
+		transform: scale(1, 0.3) translate(0, -30px);
+
+		path {
+			stroke: $facet_histogram_abbreviated_bar_color !important;
+		}
+
 	}
 
 	.facet-histogram {

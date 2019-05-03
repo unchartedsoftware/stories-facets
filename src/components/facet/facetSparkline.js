@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *	  http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,7 +35,7 @@ function FacetSparkline(svgContainer, spec) {
 	this._lineWidth = 0;
 	this._points = [];
 	this._colors = spec.colors ? spec.colors : [ '#000' ];
-	this.initializeTimeseries(svgContainer, spec.timeseries);
+	this.initializeTimeseries(svgContainer, spec.sparklines ? spec.sparklines : spec.sparkline, !!spec.sparklines);
 }
 
 /**
@@ -81,15 +81,15 @@ Object.defineProperty(FacetSparkline.prototype, 'points', {
  * Initializes the slices (bars/buckets) of this sparkline and saves them to the `_points` array.
  *
  * @method initializeSlices
- * @param {element} svg - The SVG element where the timeseries should be created.
- * @param {Array} timeseries - An array containing the timeseries to be created.
+ * @param {element} svg - The SVG element where the sparkline should be created.
+ * @param {Array} sparkline - An array containing the sparkline to be created.
  */
-FacetSparkline.prototype.initializeTimeseries = function(svg, timeseries) {
+FacetSparkline.prototype.initializeTimeseries = function(svg, sparkline, hasMultiple) {
 
 	this._svg.empty();
 
-	var sparkWidth = this._svg.width();
-	var sparkHeight = this._svg.height()-2;
+	this._sparkWidth = this._svg.width();
+	this._sparkHeight = this._svg.height() - 2;
 
 	this._minX = Infinity;
 	this._maxX = -Infinity;
@@ -98,122 +98,288 @@ FacetSparkline.prototype.initializeTimeseries = function(svg, timeseries) {
 	this._sparklineLength = 0;
 	this._points = [];
 
-	var hasMultipleSparklines = Array.isArray(timeseries[0][0]);
+	this._sparkline = sparkline;
+
+	this._hasMultipleSparklines = hasMultiple;
 
 	var that = this;
+	var x, y,  i;
 
-	if (hasMultipleSparklines) {
-		// muiltiple timeseries
+	if (this._hasMultipleSparklines) {
+		// muiltiple sparkline
 
 		var exists = {};
+		sparkline.forEach(function(subseries) {
 
-		timeseries.forEach(function(subseries) {
-			for (var i=0; i<subseries.length; i++) {
-				that._minX = Math.min(that._minX, subseries[i][TIMESERIES_X_INDEX]);
-				that._maxX = Math.max(that._maxX, subseries[i][TIMESERIES_X_INDEX]);
-				that._minY = Math.min(that._minY, subseries[i][TIMESERIES_Y_INDEX]);
-				that._maxY = Math.max(that._maxY, subseries[i][TIMESERIES_Y_INDEX]);
-				if (!exists[subseries[i][TIMESERIES_X_INDEX]]) {
-					exists[subseries[i][TIMESERIES_X_INDEX]] = true;
-					that._points.push({
-						x: subseries[i][TIMESERIES_X_INDEX],
-						y: null,
-						highlighted: false,
-						metadata: null
-					});
+			var point;
+			if (subseries.length > 0 && Array.isArray(subseries[0])) {
+
+				for (i=0; i<subseries.length; i++) {
+
+					x = subseries[i][TIMESERIES_X_INDEX];
+					y = subseries[i][TIMESERIES_Y_INDEX];
+
+					that._minX = Math.min(that._minX, x);
+					that._maxX = Math.max(that._maxX, x);
+					that._minY = Math.min(that._minY, y);
+					that._maxY = Math.max(that._maxY, y);
+
+					if (!exists[x]) {
+						point = {
+							x: x,
+							y: [ y ],
+							highlighted: false,
+							metadata: null
+						};
+						that._points.push(point);
+						exists[x] = point;
+					} else {
+						exists[x].y.push(y);
+					}
+
+				}
+
+			} else {
+
+				this._minX = 0;
+				this._maxX = Math.max(this._maxX, subseries.length - 1);
+
+				for (i=0; i<subseries.length; i++) {
+					that._minY = Math.min(that._minY, subseries[i]);
+					that._maxY = Math.max(that._maxY, subseries[i]);
+
+					if (!exists[i]) {
+						point = {
+							x: i,
+							y: [ subseries[i] ],
+							highlighted: false,
+							metadata: null
+						};
+						that._points.push(point);
+						exists[i] = point;
+					} else {
+						exists[i].y.push(subseries[i]);
+					}
 				}
 			}
-			that._points.sort(function(a, b) {
-				return a.x - b.x;
-			});
 			that._sparklineLength = Math.max(that._sparklineLength, subseries.length);
 		});
 
-		timeseries.forEach(function(subseries, index) {
-			var totalSparklinePath = that._renderSparkline(sparkWidth, sparkHeight, subseries, that._maxY, index);
+		that._points.sort(function(a, b) {
+			return a.x - b.x;
+		});
+
+		// sparkline.forEach(function(subseries, index) {
+		// 	var totalSparklinePath = that._renderSparkline(this._sparkWidth, sparkHeight, subseries, that._maxY, index);
+		// 	totalSparklinePath.appendTo(that._svg);
+		// });
+
+	} else {
+		// single sparkline
+
+		if (sparkline.length > 0 && Array.isArray(sparkline[0])) {
+
+			for (i=0; i<sparkline.length; i++) {
+				x = sparkline[i][TIMESERIES_X_INDEX];
+				y = sparkline[i][TIMESERIES_Y_INDEX];
+				that._minX = Math.min(that._minX, x);
+				that._maxX = Math.max(that._maxX, x);
+				that._minY = Math.min(that._minY, y);
+				that._maxY = Math.max(that._maxY, y);
+				this._points.push({
+					x: x,
+					y: y,
+					highlighted: false,
+					metadata: null
+				});
+			}
+
+		} else {
+
+			this._minX = 0;
+			this._maxX = sparkline.length - 1;
+			for (i=0; i<sparkline.length; i++) {
+				this._minY = Math.min(this._minY, sparkline[i]);
+				this._maxY = Math.max(this._maxY, sparkline[i]);
+				this._points.push({
+					x: i,
+					y: sparkline[i],
+					highlighted: false,
+					metadata: null
+				});
+			}
+
+		}
+		this._sparklineLength = sparkline.length;
+
+		// var totalSparklinePath = this._renderSparkline(this._sparkWidth, sparkHeight, sparkline, this._maxY, 0);
+		// totalSparklinePath.appendTo(this._svg);
+	}
+
+	this._lineWidth = this._sparkWidth / this._sparklineLength;
+
+	this._totalWidth = this._sparkWidth;
+
+	this._updateSparklines();
+};
+
+FacetSparkline.prototype._updateSparklines = function() {
+
+	this._svg.empty();
+
+	var that = this;
+
+	if (this._hasMultipleSparklines) {
+		// muiltiple sparkline
+
+		this._sparkline.forEach(function(subseries, index) {
+			var totalSparklinePath = that._renderSparkline(that._sparkWidth, that._sparkHeight, subseries, that._maxY, index);
 			totalSparklinePath.appendTo(that._svg);
+
+			var highlights = that._renderHighlights(that._sparkWidth, that._sparkHeight, subseries, that._maxY, index);
+			highlights.appendTo(that._svg);
+
+			if (that._selected) {
+				totalSparklinePath[0].classList.add('facet-sparkline-total');
+			}
 		});
 
 	} else {
-		// single timeseries
-		for (var i=0; i<timeseries.length; i++) {
-			this._minX = Math.min(this._minX, timeseries[i][TIMESERIES_X_INDEX]);
-			this._maxX = Math.max(this._maxX, timeseries[i][TIMESERIES_X_INDEX]);
-			this._minY = Math.min(this._minY, timeseries[i][TIMESERIES_Y_INDEX]);
-			this._maxY = Math.max(this._maxY, timeseries[i][TIMESERIES_Y_INDEX]);
-			this._points.push({
-				x: timeseries[i][TIMESERIES_X_INDEX],
-				y: timeseries[i][TIMESERIES_Y_INDEX],
-				highlighted: false,
-				metadata: null
-			});
-		}
-		this._sparklineLength = timeseries.length;
+		// single sparkline
 
-		var totalSparklinePath = this._renderSparkline(sparkWidth, sparkHeight, timeseries, this._maxY, 0);
+		var totalSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._sparkline, this._maxY, 0);
 		totalSparklinePath.appendTo(this._svg);
+
+		var highlights = this._renderHighlights(this._sparkWidth, this._sparkHeight, this._sparkline, this._maxY, 0);
+		highlights.appendTo(this._svg);
+
+		if (this._selected) {
+			totalSparklinePath[0].classList.add('facet-sparkline-total');
+		}
 	}
 
-	this._lineWidth = sparkWidth / this._sparklineLength;
+	if (this._selected) {
+		var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._selected, this._maxY);
+		selectedSparklinePath.appendTo(this._svg);
 
-	this._totalWidth = sparkWidth;
+		selectedSparklinePath[0].classList.add('facet-sparkline-selected');
+	}
+
 };
 
 /**
- * Creates a SVG Path element for timeseries data
+ * Creates a SVG Path element for sparkline data
  * @param {Number} width - width of the container in pixels
  * @param {Number} height - height of the container in pixels
- * @param {Array} timeseries - array of {Number} representing values over time
+ * @param {Array} sparkline - array of {Number} representing values over time
  * @param {Number} maxValue - value to treat as the total/maximum value
  * @returns {*|jQuery|HTMLElement} - SVG Path containing the rendered data without styling
  * @method _updateSparkline
  * @private
  */
-FacetSparkline.prototype._renderSparkline = function(width, height, timeseries, maxValue, index) {
+FacetSparkline.prototype._renderSparkline = function(width, height, sparkline, maxValue, index) {
 	var x = 0, y = 0;
-	var timeIdx;
+	var i;
 	var pathData = 'M ';
 
-	if (timeseries.length > 0 && Array.isArray(timeseries[0])) {
+	if (sparkline.length > 0 && Array.isArray(sparkline[0])) {
 		// each entry is two values, x and y
 
-		var first = timeseries[0];
-		var last = timeseries[timeseries.length - 1];
+		var first = sparkline[0];
+		var last = sparkline[sparkline.length - 1];
 		var xrange = last[TIMESERIES_X_INDEX] - first[TIMESERIES_X_INDEX];
 
 		var lastEntry;
-		for (timeIdx = 0; timeIdx < timeseries.length; timeIdx++) {
-			var entry = timeseries[timeIdx];
+		for (i = 0; i < sparkline.length; i++) {
+			var entry = sparkline[i];
 			if (lastEntry) {
 				x += width * ((entry[TIMESERIES_X_INDEX] - lastEntry[TIMESERIES_X_INDEX]) / xrange);
 			}
 			y = height - Math.floor((entry[TIMESERIES_Y_INDEX])/maxValue * height) + 1;
 			pathData += (x + ' ' + y);
-			if (timeIdx < timeseries.length-1) {
+			if (i < sparkline.length-1) {
 				pathData += ' L ';
 			}
 			lastEntry = entry;
 		}
 	} else {
 		// each entry is one value, y
-		var dx = width / (timeseries.length-1);
+		var dx = width / (sparkline.length-1);
 
-		for (timeIdx = 0; timeIdx < timeseries.length; timeIdx++) {
-			y = height - Math.floor((timeseries[timeIdx])/maxValue * height) + 1;
+		for (i = 0; i < sparkline.length; i++) {
+			y = height - Math.floor((sparkline[i])/maxValue * height) + 1;
 			pathData += (x + ' ' + y);
-			if (timeIdx < timeseries.length-1) {
+			if (i < sparkline.length-1) {
 				pathData += ' L ';
 			}
 			x += dx;
 		}
 	}
 
-	var pathEl = $(document.createElementNS('http://www.w3.org/2000/svg','path'));
+	var pathEl = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
+	pathEl.attr('d', pathData);
+	pathEl.css('stroke', this._colors[index % this._colors.length]);
+	pathEl.css('opacity', 0.5);
+	return pathEl;
+};
+
+FacetSparkline.prototype._renderHighlights = function(width, height, sparkline, maxValue, index) {
+
+	if (!this._highlighted) {
+		this._highlighted = {
+			from: 0,
+			to: this._sparklineLength - 1
+		};
+	}
+	var x = 0, y = 0;
+	var i;
+	var pathData = 'M ';
+
+	if (sparkline.length > 0 && Array.isArray(sparkline[0])) {
+		// each entry is two values, x and y
+
+		var first = sparkline[0];
+		var last = sparkline[sparkline.length - 1];
+		var xrange = last[TIMESERIES_X_INDEX] - first[TIMESERIES_X_INDEX];
+
+		var lastEntry;
+		for (i = 0; i <= this._highlighted.to; i++) {
+			var entry = sparkline[i];
+			if (lastEntry) {
+				x += width * ((entry[TIMESERIES_X_INDEX] - lastEntry[TIMESERIES_X_INDEX]) / xrange);
+			}
+			y = height - Math.floor((entry[TIMESERIES_Y_INDEX])/maxValue * height) + 1;
+
+			if (i >= this._highlighted.from) {
+				pathData += (x + ' ' + y);
+				if (i < this._highlighted.to) {
+					pathData += ' L ';
+				}
+			}
+			lastEntry = entry;
+		}
+	} else {
+		// each entry is one value, y
+		var dx = width / (sparkline.length-1);
+
+		for (i = 0; i <= this._highlighted.to; i++) {
+			y = height - Math.floor((sparkline[i])/maxValue * height) + 1;
+
+			if (i >= this._highlighted.from) {
+				pathData += (x + ' ' + y);
+				if (i < this._highlighted.to) {
+					pathData += ' L ';
+				}
+			}
+			x += dx;
+		}
+	}
+
+	var pathEl = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
 	pathEl.attr('d', pathData);
 	pathEl.css('stroke', this._colors[index % this._colors.length]);
 	return pathEl;
 };
-
 
 /**
  * Converts a pixel range into a bar range.
@@ -250,10 +416,8 @@ FacetSparkline.prototype.pointRangeToPixelRange = function (pointRange) {
  * @param {{from: number, to: number}} range - The bar range to highlight.
  */
 FacetSparkline.prototype.highlightRange = function (range) {
-	// var points = this._points;
-	// for (var i = 0, n = points.length; i < n; ++i) {
-	// 	this._points[i].highlighted = this._spec.alwaysHighlight || (i >= range.from && i <= range.to);
-	// }
+	this._highlighted = range;
+	this._updateSparklines();
 };
 
 /**
@@ -263,20 +427,31 @@ FacetSparkline.prototype.highlightRange = function (range) {
  * @param {{from: number, to: number}} range - The value range to highlight.
  */
 FacetSparkline.prototype.highlightValueRange = function (range) {
-	// var points = this._points;
-	// for (var i = 0, n = points.length; i < n; ++i) {
-	// 	points[i].highlighted = (range.from >= points[i].x && range.to <= points[i].x);
-	// }
+	this._highlighted = {
+		from: Infinity,
+		to: -Infinity
+	};
+	var points = this._points;
+	for (var i = 0, n = points.length; i < n; ++i) {
+		if (points[i].x >= range.from) {
+			this._highlighted.from = Math.min(this._highlighted.from, i);
+		}
+		if (points[i].x <= range.to) {
+			this._highlighted.to = Math.min(this._highlighted.to, i);
+		}
+	}
+	this._updateSparklines();
 };
 
 /**
- * Selects the specified counts for each bar as specified in the `timeseries` parameter.
+ * Selects the specified counts for each bar as specified in the `sparkline` parameter.
  *
  * @method select
- * @param {Object} timeseries - Data used to select sub-bar counts in this sparkline.
+ * @param {Object} sparkline - Data used to select sub-bar counts in this sparkline.
  */
-FacetSparkline.prototype.select = function (timeseries) {
-	// not implemented
+FacetSparkline.prototype.select = function (sparkline) {
+	this._selected = sparkline;
+	this._updateSparklines();
 };
 
 /**
@@ -285,7 +460,8 @@ FacetSparkline.prototype.select = function (timeseries) {
  * @method deselect
  */
 FacetSparkline.prototype.deselect = function () {
-	// not implemented
+	this._selected = null;
+	this._updateSparklines();
 };
 
 /**

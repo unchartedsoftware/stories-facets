@@ -291,8 +291,8 @@ FacetHorizontal.prototype.select = function(data) {
 			}
 
 			this._sparkline.deselect();
-			if ('points' in selectionData) {
-				this._sparkline.select(selectionData.points);
+			if ('sparkline' in selectionData) {
+				this._sparkline.select(selectionData.sparkline);
 			}
 		}
 
@@ -355,8 +355,9 @@ FacetHorizontal.prototype.processSpec = function(inData) {
 		};
 		return outData;
 
-	} else if (inData.timeseries) {
+	} else if (inData.sparkline || inData.sparklines) {
 
+		inData.filterable = inData.filterable !== undefined ? inData.filterable : true;
 		return inData;
 	}
 
@@ -410,7 +411,8 @@ FacetHorizontal.prototype.updateSpec = function (spec) {
 
 	} else if (this._sparkline) {
 
-		this._spec.timeseries = this._spec.timeseries.concat(spec.timeseries);
+		this._spec.sparkline = spec.sparkline;
+		this._spec.sparklines = spec.sparklines;
 
 	}
 
@@ -475,7 +477,7 @@ FacetHorizontal.prototype._initializeLayout = function(template) {
 		this._histogramFilter = new HistogramFilter(this._element, this._histogram, spec);
 		this._histogramFilter.setFilterPixelRange({ from: 0, to: this._histogram.totalWidth });
 
-	} else if (this._spec.timeseries) {
+	} else if (this._spec.sparkline || this._spec.sparklines) {
 
 		this._sparkline = new Sparkline(this._svg, this._spec);
 		this._sparklineFilter = new SparklineFilter(this._element, this._sparkline, spec);

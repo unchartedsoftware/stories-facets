@@ -18,7 +18,23 @@
 		</div>
 	{{/if}}
 
-	{{#if timeseries}}
+	{{#if sparkline}}
+		<div class="facet-range-sparkline">
+			<div class="facet-sparkline-container">
+				<svg class="facet-sparkline"></svg>
+			</div>
+			{{#if filterable}}
+				<div class="facet-range-filter facet-range-filter-init">
+					<div class="facet-range-filter-slider facet-range-filter-left">
+					</div>
+					<div class="facet-range-filter-slider facet-range-filter-right">
+					</div>
+				</div>
+			{{/if}}
+		</div>
+	{{/if}}
+
+	{{#if sparklines}}
 		<div class="facet-range-sparkline">
 			<div class="facet-sparkline-container">
 				<svg class="facet-sparkline"></svg>
