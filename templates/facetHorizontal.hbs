@@ -3,17 +3,53 @@
 	facets-facet-horizontal-hidden
 {{/if}}
 ">
-	<div class="facet-range">
-		<svg class="facet-histogram"></svg>
-		{{#if filterable}}
-			<div class="facet-range-filter facet-range-filter-init">
-				<div class="facet-range-filter-slider facet-range-filter-left">
+
+	{{#if histogram}}
+		<div class="facet-range-histogram">
+			<svg class="facet-histogram"></svg>
+			{{#if filterable}}
+				<div class="facet-range-filter facet-range-filter-init">
+					<div class="facet-range-filter-slider facet-range-filter-left">
+					</div>
+					<div class="facet-range-filter-slider facet-range-filter-right">
+					</div>
 				</div>
-				<div class="facet-range-filter-slider facet-range-filter-right">
-				</div>
+			{{/if}}
+		</div>
+	{{/if}}
+
+	{{#if sparkline}}
+		<div class="facet-range-sparkline">
+			<div class="facet-sparkline-container">
+				<svg class="facet-sparkline"></svg>
 			</div>
-		{{/if}}
-	</div>
+			{{#if filterable}}
+				<div class="facet-range-filter facet-range-filter-init">
+					<div class="facet-range-filter-slider facet-range-filter-left">
+					</div>
+					<div class="facet-range-filter-slider facet-range-filter-right">
+					</div>
+				</div>
+			{{/if}}
+		</div>
+	{{/if}}
+
+	{{#if sparklines}}
+		<div class="facet-range-sparkline">
+			<div class="facet-sparkline-container">
+				<svg class="facet-sparkline"></svg>
+			</div>
+			{{#if filterable}}
+				<div class="facet-range-filter facet-range-filter-init">
+					<div class="facet-range-filter-slider facet-range-filter-left">
+					</div>
+					<div class="facet-range-filter-slider facet-range-filter-right">
+					</div>
+				</div>
+			{{/if}}
+		</div>
+	{{/if}}
+
 	<div class="facet-range-labels">
 		<div class="facet-range-label">{{leftRangeLabel}}</div>
 		<div class="facet-range-label">{{rightRangeLabel}}</div>

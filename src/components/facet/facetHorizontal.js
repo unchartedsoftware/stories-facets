@@ -18,6 +18,8 @@ var _ = require('../../util/util');
 var Facet = require('./facet');
 var Histogram = require('./facetHistogram');
 var HistogramFilter = require('./facetHistogramFilter');
+var Sparkline = require('./facetSparkline');
+var SparklineFilter = require('./facetSparklineFilter');
 var Template = require('../../templates/facetHorizontal');
 
 var ABBREVIATED_CLASS = 'facets-facet-horizontal-abbreviated';
@@ -136,27 +138,60 @@ Object.defineProperty(FacetHorizontal.prototype, 'visible', {
  */
 Object.defineProperty(FacetHorizontal.prototype, 'filterRange', {
 	get: function () {
-		var barRange = this._histogramFilter.barRange;
-		var pixelRange = this._histogramFilter.pixelRange;
-		var fromInfo = this._histogram.bars[barRange.from].info;
-		var toInfo = this._histogram.bars[barRange.to].info;
 
-		return {
-			from: {
-				index: barRange.from,
-				pixel: pixelRange.from,
-				label: fromInfo.label,
-				count: fromInfo.count,
-				metadata: fromInfo.metadata
-			},
-			to: {
-				index: barRange.to,
-				pixel: pixelRange.to,
-				label: toInfo.toLabel,
-				count: toInfo.count,
-				metadata: toInfo.metadata
-			}
-		};
+		var barRange, pointRange, pixelRange, fromInfo, toInfo;
+
+		if (this._histogram) {
+
+			barRange = this._histogramFilter.barRange;
+			pixelRange = this._histogramFilter.pixelRange;
+			fromInfo = this._histogram.bars[barRange.from].info;
+			toInfo = this._histogram.bars[barRange.to].info;
+
+			return {
+				from: {
+					index: barRange.from,
+					pixel: pixelRange.from,
+					label: fromInfo.label,
+					count: fromInfo.count,
+					metadata: fromInfo.metadata
+				},
+				to: {
+					index: barRange.to,
+					pixel: pixelRange.to,
+					label: toInfo.toLabel,
+					count: toInfo.count,
+					metadata: toInfo.metadata
+				}
+			};
+
+		} else if (this._sparkline) {
+
+			pointRange = this._sparklineFilter.pointRange;
+			pixelRange = this._sparklineFilter.pixelRange;
+			fromInfo = this._sparkline.points[pointRange.from];
+			toInfo = this._sparkline.points[pointRange.to];
+
+			return {
+				from: {
+					index: pointRange.from,
+					pixel: pixelRange.from,
+					label: [fromInfo.x],
+					count: [fromInfo.y],
+					metadata: fromInfo.metadata
+				},
+				to: {
+					index: pointRange.to,
+					pixel: pixelRange.to,
+					label: [toInfo.x],
+					count: [toInfo.y],
+					metadata: toInfo.metadata
+				}
+			};
+
+		}
+
+
 	}
 });
 
@@ -167,50 +202,102 @@ Object.defineProperty(FacetHorizontal.prototype, 'filterRange', {
  * @param {Object} data - Data used to select a range and sub-bar counts in this facet.
  */
 FacetHorizontal.prototype.select = function(data) {
-	if (data && 'selection' in data) {
-		var selectionData = data.selection;
 
-		if ('range' in selectionData) {
-			var from = selectionData.range.from;
-			var to = selectionData.range.to;
+	var selectionData, from, to, fromIsString, toIsString, i, n;
 
-			var fromIsString = (typeof from === 'string' || (typeof from === 'object' && from.constructor === String));
-			var toIsString = (typeof to === 'string' || (typeof to === 'object' && to.constructor === String));
+	if (this._histogram) {
 
-			var bars = this._histogram.bars;
-			for (var i = 0, n = bars.length; i < n && (fromIsString || toIsString); ++i) {
-				var barMetadata = bars[i].metadata;
+		if (data && 'selection' in data) {
+			selectionData = data.selection;
 
-				for (var ii = 0, nn = barMetadata.length; ii < nn; ++ii) {
-					var slice = barMetadata[ii];
+			if ('range' in selectionData) {
+				from = selectionData.range.from;
+				to = selectionData.range.to;
 
-					binStart = slice.label !== undefined ? slice.label : slice.binStart;
-					binEnd = slice.toLabel !== undefined ? slice.toLabel : slice.binEnd;
+				// string arguments are labels, number arguments are bin indices
 
-					if (fromIsString && (binStart === from || +binStart === +from)) {
+				fromIsString = (typeof from === 'string' || (typeof from === 'object' && from.constructor === String));
+				toIsString = (typeof to === 'string' || (typeof to === 'object' && to.constructor === String));
+
+				var bars = this._histogram.bars;
+				for (i = 0, n = bars.length; i < n && (fromIsString || toIsString); ++i) {
+					var barMetadata = bars[i].metadata;
+
+					for (var ii = 0, nn = barMetadata.length; ii < nn; ++ii) {
+						var slice = barMetadata[ii];
+
+						binStart = slice.label !== undefined ? slice.label : slice.binStart;
+						binEnd = slice.toLabel !== undefined ? slice.toLabel : slice.binEnd;
+
+						if (fromIsString && (binStart === from || +binStart === +from)) {
+							from = i;
+							fromIsString = false;
+						}
+
+						if (toIsString && (binEnd === to || +binEnd === +to)) {
+							to = i;
+							toIsString = false;
+						}
+					}
+				}
+
+				if (!fromIsString && !toIsString) {
+					this._histogramFilter.setFilterBarRange({from: from, to: to});
+				}
+			} else {
+				this._histogramFilter.setFilterPixelRange({ from: 0, to: this._histogram.totalWidth });
+			}
+
+			this._histogram.deselect();
+			if ('slices' in selectionData) {
+				this._histogram.select(selectionData.slices);
+			}
+		}
+
+	} else if (this._sparkline) {
+
+		if (data && 'selection' in data) {
+			selectionData = data.selection;
+
+			if ('range' in selectionData) {
+				from = selectionData.range.from;
+				to = selectionData.range.to;
+
+				// string arguments are labels, number arguments are bin indices
+
+				fromIsString = (typeof from === 'string' || (typeof from === 'object' && from.constructor === String));
+				toIsString = (typeof to === 'string' || (typeof to === 'object' && to.constructor === String));
+
+				var points = this._sparkline.points;
+				for (i = 0, n = points.length; i < n && (fromIsString || toIsString); ++i) {
+					var x = points[i].x;
+
+					if (fromIsString && (x === from || +x === +from)) {
 						from = i;
 						fromIsString = false;
 					}
 
-					if (toIsString && (binEnd === to || +binEnd === +to)) {
+					if (toIsString && (x === to || +x === +to)) {
 						to = i;
 						toIsString = false;
 					}
 				}
+
+				if (!fromIsString && !toIsString) {
+					this._sparklineFilter.setFilterPointRange({from: from, to: to});
+				}
+			} else {
+				this._sparklineFilter.setFilterPixelRange({ from: 0, to: this._sparkline.totalWidth });
 			}
 
-			if (!fromIsString && !toIsString) {
-				this._histogramFilter.setFilterBarRange({from: from, to: to});
+			this._sparkline.deselect();
+			if ('sparkline' in selectionData) {
+				this._sparkline.select(selectionData.sparkline);
 			}
-		} else {
-			this._histogramFilter.setFilterPixelRange({ from: 0, to: this._histogram.totalWidth });
 		}
 
-		this._histogram.deselect();
-		if ('slices' in selectionData) {
-			this._histogram.select(selectionData.slices);
-		}
 	}
+
 };
 
 /**
@@ -219,8 +306,18 @@ FacetHorizontal.prototype.select = function(data) {
  * @method deselect
  */
 FacetHorizontal.prototype.deselect = function() {
-	this._histogramFilter.setFilterPixelRange({ from: 0, to: this._histogram.totalWidth });
-	this._histogram.deselect();
+
+	if (this._histogram) {
+
+		this._histogramFilter.setFilterPixelRange({ from: 0, to: this._histogram.totalWidth });
+		this._histogram.deselect();
+
+	} else if (this._sparkline) {
+
+		this._sparklineFilter.setFilterPixelRange({ from: 0, to: this._sparkline.totalWidth });
+		this._sparkline.deselect();
+	}
+
 };
 
 /**
@@ -231,29 +328,39 @@ FacetHorizontal.prototype.deselect = function() {
  * @returns {Object}
  */
 FacetHorizontal.prototype.processSpec = function(inData) {
-	var histogram = this.processHistogram(inData.histogram);
-	histogram.scaleFn = inData.scaleFn;
-	histogram.alwaysHighlight = inData.alwaysHighlight;
-	var firstSlice = histogram.slices[0];
-	var lastSlice = histogram.slices[histogram.slices.length - 1];
 
-	var leftRangeLabel = firstSlice.label !== undefined ? firstSlice.label : firstSlice.binStart;
-	var rightRangeLabel = (lastSlice.toLabel !== undefined || lastSlice.label !== undefined) ? (lastSlice.toLabel || lastSlice.label) : (lastSlice.binEnd || lastSlice.binStart);
+	if (inData.histogram) {
 
-	var displayFn = $.isFunction(inData.displayFn) ? inData.displayFn : false;
-	if (displayFn) {
-		leftRangeLabel = displayFn(leftRangeLabel);
-		rightRangeLabel = displayFn(rightRangeLabel);
+		var histogram = this.processHistogram(inData.histogram);
+		histogram.scaleFn = inData.scaleFn;
+		histogram.alwaysHighlight = inData.alwaysHighlight;
+		var firstSlice = histogram.slices[0];
+		var lastSlice = histogram.slices[histogram.slices.length - 1];
+
+		var leftRangeLabel = firstSlice.label !== undefined ? firstSlice.label : firstSlice.binStart;
+		var rightRangeLabel = (lastSlice.toLabel !== undefined || lastSlice.label !== undefined) ? (lastSlice.toLabel || lastSlice.label) : (lastSlice.binEnd || lastSlice.binStart);
+
+		var displayFn = $.isFunction(inData.displayFn) ? inData.displayFn : false;
+		if (displayFn) {
+			leftRangeLabel = displayFn(leftRangeLabel);
+			rightRangeLabel = displayFn(rightRangeLabel);
+		}
+
+		var outData = {
+			histogram: histogram,
+			leftRangeLabel: leftRangeLabel,
+			rightRangeLabel: rightRangeLabel,
+			filterable: inData.filterable !== undefined ? inData.filterable : true,
+			displayFn: displayFn
+		};
+		return outData;
+
+	} else if (inData.sparkline || inData.sparklines) {
+
+		inData.filterable = inData.filterable !== undefined ? inData.filterable : true;
+		return inData;
 	}
 
-	var outData = {
-		histogram: histogram,
-		leftRangeLabel: leftRangeLabel,
-		rightRangeLabel: rightRangeLabel,
-		filterable: inData.filterable !== undefined ? inData.filterable : true,
-		displayFn: displayFn
-	};
-	return outData;
 };
 
 /**
@@ -297,9 +404,20 @@ FacetHorizontal.prototype.processHistogram = function(inData) {
  * @param {Object} spec - The new spec for the facet
  */
 FacetHorizontal.prototype.updateSpec = function (spec) {
+
+	if (this._histogram) {
+
+		this._spec.histogram = this._spec.histogram.concat(spec.histogram);
+
+	} else if (this._sparkline) {
+
+		this._spec.sparkline = spec.sparkline;
+		this._spec.sparklines = spec.sparklines;
+
+	}
+
 	this._removeHandlers();
 	this._element.remove();
-	this._spec.histogram.push.apply(this._spec.histogram, spec.histogram);
 	this._spec = this.processSpec(this._spec);
 	this._initializeLayout(Template);
 	this.select(spec);
@@ -349,13 +467,22 @@ FacetHorizontal.prototype._initializeLayout = function(template) {
 	this._container.append(this._element);
 	this._svg = this._element.find('svg');
 
-	this._histogram = new Histogram(this._svg, this._spec.histogram);
+	var spec = {
+		displayFn: this._spec.displayFn
+	};
 
-  var spec = {
-    displayFn: this._spec.displayFn
-  };
-	this._histogramFilter = new HistogramFilter(this._element, this._histogram, spec);
-	this._histogramFilter.setFilterPixelRange({ from: 0, to: this._histogram.totalWidth });
+	if (this._spec.histogram) {
+
+		this._histogram = new Histogram(this._svg, this._spec.histogram);
+		this._histogramFilter = new HistogramFilter(this._element, this._histogram, spec);
+		this._histogramFilter.setFilterPixelRange({ from: 0, to: this._histogram.totalWidth });
+
+	} else if (this._spec.sparkline || this._spec.sparklines) {
+
+		this._sparkline = new Sparkline(this._svg, this._spec);
+		this._sparklineFilter = new SparklineFilter(this._element, this._sparkline, spec);
+		this._sparklineFilter.setFilterPixelRange({ from: 0, to: this._sparkline.totalWidth });
+	}
 
 	this._rangeControls = this._element.find('.facet-range-controls');
 };
@@ -367,17 +494,33 @@ FacetHorizontal.prototype._initializeLayout = function(template) {
  * @private
  */
 FacetHorizontal.prototype._addHandlers = function() {
-	if (this.visible) {
-		var bars = this._histogram.bars;
-		for (var i = 0, n = bars.length; i < n; ++i) {
-			bars[i]._addHandlers();
-			bars[i].onMouseEnter = this._onMouseEventBar.bind(this, 'facet-histogram:mouseenter');
-			bars[i].onMouseLeave = this._onMouseEventBar.bind(this, 'facet-histogram:mouseleave');
-			bars[i].onClick = this._onMouseEventBar.bind(this, 'facet-histogram:click');
+
+	if (this._histogram) {
+
+		if (this.visible) {
+			var bars = this._histogram.bars;
+			for (var i = 0, n = bars.length; i < n; ++i) {
+				bars[i]._addHandlers();
+				bars[i].onMouseEnter = this._onMouseEventBar.bind(this, 'facet-histogram:mouseenter');
+				bars[i].onMouseLeave = this._onMouseEventBar.bind(this, 'facet-histogram:mouseleave');
+				bars[i].onClick = this._onMouseEventBar.bind(this, 'facet-histogram:click');
+			}
+			this._histogramFilter.onFilterChanged = this._onFilterChanged.bind(this);
 		}
 
-		this._histogramFilter.onFilterChanged = this._onFilterChanged.bind(this);
+	} else if (this._sparkline) {
+
+		// var points = this._sparkline.points;
+		// for (var i = 0, n = bars.length; i < n; ++i) {
+		// 	bars[i]._addHandlers();
+		// 	bars[i].onMouseEnter = this._onMouseEventBar.bind(this, 'facet-histogram:mouseenter');
+		// 	bars[i].onMouseLeave = this._onMouseEventBar.bind(this, 'facet-histogram:mouseleave');
+		// 	bars[i].onClick = this._onMouseEventBar.bind(this, 'facet-histogram:click');
+		// }
+		this._sparklineFilter.onFilterChanged = this._onFilterChanged.bind(this);
 	}
+
+
 };
 
 /**
@@ -387,15 +530,25 @@ FacetHorizontal.prototype._addHandlers = function() {
  * @private
  */
 FacetHorizontal.prototype._removeHandlers = function() {
-	var bars = this._histogram.bars;
-	for (var i = 0, n = bars.length; i < n; ++i) {
-		bars[i]._removeHandlers();
-		bars[i].onMouseEnter = null;
-		bars[i].onMouseLeave = null;
-		bars[i].onClick = null;
+
+	if (this._histogram) {
+
+		var bars = this._histogram.bars;
+		for (var i = 0, n = bars.length; i < n; ++i) {
+			bars[i]._removeHandlers();
+			bars[i].onMouseEnter = null;
+			bars[i].onMouseLeave = null;
+			bars[i].onClick = null;
+		}
+
+		this._histogramFilter.onFilterChanged = null;
+
+	} else if (this._sparkline) {
+
+		this._sparklineFilter.onFilterChanged = null;
+
 	}
 
-	this._histogramFilter.onFilterChanged = null;
 };
 
 /**
@@ -408,16 +561,16 @@ FacetHorizontal.prototype._removeHandlers = function() {
  * @private
  */
 FacetHorizontal.prototype._onMouseEventBar = function (type, bar, event) {
-  var info = bar.info;
-  this._formatLabels(info);
-  this.emit(type, event, this._key, info, this);
+	var info = bar.info;
+	this._formatLabels(info);
+	this.emit(type, event, this._key, info, this);
 };
 
 FacetHorizontal.prototype._formatLabels = function (barInfo) {
-  if (this._spec.displayFn) {
-    barInfo.label = barInfo.label.map(this._spec.displayFn);
-    barInfo.toLabel = barInfo.toLabel.map(this._spec.displayFn);
-  }
+	if (this._spec.displayFn) {
+		barInfo.label = barInfo.label.map(this._spec.displayFn);
+		barInfo.toLabel = barInfo.toLabel.map(this._spec.displayFn);
+	}
 };
 
 /**

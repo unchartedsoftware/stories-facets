@@ -36,8 +36,7 @@ function FacetHistogram (svgContainer, spec) {
 	this._bars = [];
 	this._maxBarHeight = 0;
 	this._showOrigin = ('showOrigin' in spec) ? spec.showOrigin : false;
-  this._displayFn = $.isFunction(spec.displayFn) ? spec.displayFn : false;
-
+	this._displayFn = $.isFunction(spec.displayFn) ? spec.displayFn : false;
 	this.initializeSlices(svgContainer, spec.slices);
 }
 
@@ -239,7 +238,7 @@ FacetHistogram.prototype.barRangeToPixelRange = function (barRange) {
 FacetHistogram.prototype.highlightRange = function (range) {
 	var bars = this._bars;
 	for (var i = 0, n = bars.length; i < n; ++i) {
-          bars[i].highlighted = this._spec.alwaysHighlight || (i >= range.from && i <= range.to);
+		bars[i].highlighted = this._spec.alwaysHighlight || (i >= range.from && i <= range.to);
 	}
 };
 
@@ -273,26 +272,25 @@ FacetHistogram.prototype.select = function (slices) {
 	for (var i = 0, n = bars.length; i < n; ++i) {
 		var bar = bars[i];
 		var barMetadata = bar.metadata;
-                var count = 0;
+		var count = 0;
 		for (var ii = 0, nn = barMetadata.length; ii < nn; ++ii) {
 			var slice = barMetadata[ii];
-                        var key = slice.label !== undefined ? slice.label : slice.binStart;
+			var key = slice.label !== undefined ? slice.label : slice.binStart;
 			if (key in slices) {
 				count += slices[key];
 			}
+		}
 
-                }
+		if (this._scaleFn) {
+			count = this._scaleFn(count);
+		}
 
-                if(this._scaleFn) {
-                        count = this._scaleFn(count);
-                }
-
-                var newHeight = Math.ceil(svgHeight * (count / yMax));
-                if (bar.selectedHeight === null) {
-                        bar.selectedHeight = newHeight;
-                } else {
-                        bar.selectedHeight = Math.max(bar.selectedHeight, newHeight);
-                }
+		var newHeight = Math.ceil(svgHeight * (count / yMax));
+		if (bar.selectedHeight === null) {
+			bar.selectedHeight = newHeight;
+		} else {
+			bar.selectedHeight = Math.max(bar.selectedHeight, newHeight);
+		}
 	}
 };
 
