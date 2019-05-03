@@ -42,7 +42,7 @@ function main() {
 
 	var groups = [
 		{
-			label: 'NYSE:MSFT',
+			label: 'NASDAQ:MSFT',
 			key: 'microsoft',
 			facets: [
 				{
@@ -52,7 +52,7 @@ function main() {
 			]
 		},
 		{
-			label: 'Nasdaq:AMZN',
+			label: 'NASDAQ:AMZN',
 			key: 'amazon',
 			facets: [
 				{
@@ -62,7 +62,7 @@ function main() {
 			]
 		},
 		{
-			label: 'Nasdaq:GOOG',
+			label: 'NASDAQ:GOOG',
 			key: 'google',
 			facets: [
 				{
@@ -72,7 +72,7 @@ function main() {
 			]
 		},
 		{
-			label: 'Nasdaq:FB',
+			label: 'NASDAQ:FB',
 			key: 'facebook',
 			facets: [
 				{
