@@ -94,7 +94,7 @@ gulp.task('tdd', function(done) {
     }, done).start();
 });
 
-gulp.task('test', function() {
+gulp.task('test', function(done) {
     if (!fs.existsSync('bamboo')) fs.mkdirSync('bamboo');
     new karma.Server({
         configFile: path.join(__dirname, './karma.conf.js'),
@@ -102,6 +102,7 @@ gulp.task('test', function() {
         autoWatch: false,
         browsers: ['PhantomJS']
     }, function(exitcode) {
+        done();
         process.exit(exitcode);
     }).start();
 });
@@ -122,10 +123,12 @@ gulp.task('minify-css',function() {
     return doCSS(true);
 });
 
-gulp.task('build', ['build-js', 'build-css'], function () {
+gulp.task('build', gulp.parallel('build-js', 'build-css'), function (done) {
+    return done();
 });
 
-gulp.task('minify', ['minify-js', 'minify-css'], function () {
+gulp.task('minify', gulp.parallel('minify-js', 'minify-css'), function (done) {
+    return done();
 });
 
 // Links library to allow live
@@ -172,12 +175,25 @@ gulp.task('watch',function () {
     gulp.watch(config.dist + '/facets.min.*', ['jspm:link']);
 });
 
-gulp.task('install',function(done) {
-    runSequence('build-templates', ['lint'], ['build','build-extern-js','build-extern-css'], done);
+gulp.task('install', gulp.series('build-templates', 'lint', gulp.parallel('build','build-extern-js','build-extern-css')), function (done) {
+    return done();
 });
-gulp.task('deploy',function(done) {
-    runSequence('build-templates', ['lint'], ['build', 'minify','build-extern-js','build-extern-css'], done);
+
+// gulp.task('install',function(done) {
+//     runSequence('build-templates', ['lint'], ['build','build-extern-js','build-extern-css'], done);
+// });
+
+gulp.task('deploy', gulp.series('build-templates', 'lint', gulp.parallel('build', 'minify','build-extern-js','build-extern-css')), function (done) {
+    return done();
 });
-gulp.task('default', function(done) {
-    runSequence('build-templates', ['lint'], ['build','minify','build-extern-js','build-extern-css'], 'jspm:link', 'watch', done);
+
+// gulp.task('deploy',function(done) {
+//     runSequence('build-templates', ['lint'], ['build', 'minify','build-extern-js','build-extern-css'], done);
+// });
+
+gulp.task('default', gulp.series('build-templates', 'lint', gulp.parallel('build', 'minify','build-extern-js','build-extern-css'), 'jspm:link', 'watch'), function (done) {
+    return done();
 });
+// gulp.task('default', function(done) {
+//     runSequence('build-templates', ['lint'], ['build','minify','build-extern-js','build-extern-css'], 'jspm:link', 'watch', done);
+// });
