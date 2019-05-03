@@ -22,7 +22,7 @@ jobs:
           paths:
             - node_modules
 
-      - run: gulp deploy
+      - run: ./node_modules/.bin/gulp deploy
 
       - persist_to_workspace:
           root: ~/stories-facets
