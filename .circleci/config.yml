@@ -14,7 +14,6 @@ jobs:
       - restore_cache:
           keys:
             - v1-npm-deps-{{ checksum "package-lock.json" }}
-            - v1-npm-deps-
       
       - run: npm install
       
@@ -22,6 +21,8 @@ jobs:
           key: v1-npm-deps-{{ checksum "package-lock.json" }}
           paths:
             - node_modules
+
+      - run: ./node_modules/.bin/gulp deploy
 
       - persist_to_workspace:
           root: ~/stories-facets
