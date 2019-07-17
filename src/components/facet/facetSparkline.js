@@ -169,11 +169,6 @@ FacetSparkline.prototype.initializeTimeseries = function(svg, sparkline, hasMult
 			return a.x - b.x;
 		});
 
-		// sparkline.forEach(function(subseries, index) {
-		// 	var totalSparklinePath = that._renderSparkline(this._sparkWidth, sparkHeight, subseries, that._maxY, index);
-		// 	totalSparklinePath.appendTo(that._svg);
-		// });
-
 	} else {
 		// single sparkline
 
@@ -211,9 +206,6 @@ FacetSparkline.prototype.initializeTimeseries = function(svg, sparkline, hasMult
 
 		}
 		this._sparklineLength = sparkline.length;
-
-		// var totalSparklinePath = this._renderSparkline(this._sparkWidth, sparkHeight, sparkline, this._maxY, 0);
-		// totalSparklinePath.appendTo(this._svg);
 	}
 
 	this._lineWidth = this._sparkWidth / this._sparklineLength;

@@ -32,7 +32,14 @@ function main() {
 					icon: {class: 'fa fa-male', color: 'green'},
 					count: 28,
 					value: 'Linda',
-					timeseries : [[0,4],[1,2],[2,0],[3,4],[4,2],[5,0],[6,8],[7,8],[8,0],[9,0],[10,0]]
+					multipleTimeseries : [
+						[[0,4],[1,2],[2,0],[3,4],[4,2],[5,0],[6,8],[7,8],[8,0],[9,0],[10,0]],
+						[[0,0],[2,8],[3,0],[6,4],[7,2],[8,2],[12,8],[14,0],[18,0],[19,0],[22,0]]
+					],
+					colors: [
+						'#000',
+						'#3B5998',
+					]
 				},
 				{
 					icon: {class: 'fa fa-male', color: 'blue'},
@@ -50,7 +57,14 @@ function main() {
 					icon: {class: 'fa fa-male', color: 'goldenrod'},
 					count: 6,
 					value: 'Maya',
-					timeseries : [0,0,0,4,2,0,0,0,0,0,0]
+					multipleTimeseries : [
+						[0,0,0,4,2,0,0,0,0,0,0],
+						[0,0,1,2,0,3,0,0,0,4,1]
+					],
+					colors: [
+						'#000',
+						'#3CBA54',
+					]
 				},
 				{
 					icon: {class: 'fa fa-male', color: 'magenta'},
