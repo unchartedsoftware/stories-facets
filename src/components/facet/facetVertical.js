@@ -52,6 +52,8 @@ function FacetVertical (container, parentGroup, spec) {
 	this._type = this._spec.isQuery ? 'query' : 'facet';
 	this._hasEmittedSelectedEvent = false;
 
+	this._colors = spec.colors ? spec.colors : (this._spec.icon.color ? [ this._spec.icon.color ] : [ '#000' ]);
+
 	if (this._spec.isQuery && this._key != '*') {
 		this._spec.displayValue = this._key + ':' + (this._spec.label ? this._spec.label : this._spec.value);
 	}
@@ -352,6 +354,8 @@ FacetVertical.prototype._initializeLayout = function(template) {
 	}
 
 	this._sparklineContainer = this._element.find('.facet-sparkline-container');
+	this._sparklineSVG = $(facetVertical_sparkline(this._spec));
+	this._sparklineContainer.append(this._sparklineSVG);
 };
 
 /**
@@ -392,50 +396,51 @@ FacetVertical.prototype._removeHandlers = function() {
  * @param {Array} timeseries - array of {Number} representing values over time
  * @param {Number} maxValue - value to treat as the total/maximum value
  * @returns {*|jQuery|HTMLElement} - SVG Path containing the rendered data without styling
- * @method _updateSparkline
+ * @method _renderSparkline
  * @private
  */
-FacetVertical.prototype._renderSparkline = function(width, height, timeseries, maxValue) {
+FacetVertical.prototype._renderSparkline = function(width, height, sparkline, maxValue, index) {
+
 	var x = 0, y = 0;
-	var timeIdx;
+	var i;
 	var pathData = 'M ';
 
-	if (timeseries.length > 0 && Array.isArray(timeseries[0])) {
+	if (sparkline.length > 0 && Array.isArray(sparkline[0])) {
 		// each entry is two values, x and y
 
-		var first = timeseries[0];
-		var last = timeseries[timeseries.length - 1];
+		var first = sparkline[0];
+		var last = sparkline[sparkline.length - 1];
 		var xrange = last[TIMESERIES_X_INDEX] - first[TIMESERIES_X_INDEX];
 
 		var lastEntry;
-		for (timeIdx = 0; timeIdx < timeseries.length; timeIdx++) {
-			var entry = timeseries[timeIdx];
+		for (i = 0; i < sparkline.length; i++) {
+			var entry = sparkline[i];
 			if (lastEntry) {
 				x += width * ((entry[TIMESERIES_X_INDEX] - lastEntry[TIMESERIES_X_INDEX]) / xrange);
 			}
 			y = height - Math.floor((entry[TIMESERIES_Y_INDEX])/maxValue * height) + 1;
 			pathData += (x + ' ' + y);
-			if (timeIdx < timeseries.length-1) {
+			if (i < sparkline.length-1) {
 				pathData += ' L ';
 			}
 			lastEntry = entry;
 		}
 	} else {
 		// each entry is one value, y
-		var dx = width / (timeseries.length-1);
+		var dx = width / (sparkline.length-1);
 
-		for (timeIdx = 0; timeIdx < timeseries.length; timeIdx++) {
-			y = height - Math.floor((timeseries[timeIdx])/maxValue * height) + 1;
+		for (i = 0; i < sparkline.length; i++) {
+			y = height - Math.floor((sparkline[i])/maxValue * height) + 1;
 			pathData += (x + ' ' + y);
-			if (timeIdx < timeseries.length-1) {
+			if (i < sparkline.length-1) {
 				pathData += ' L ';
 			}
 			x += dx;
 		}
 	}
 
-	var pathEl = $(document.createElementNS('http://www.w3.org/2000/svg','path'));
-	pathEl.attr('d',pathData);
+	var pathEl = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
+	pathEl.attr('d', pathData);
 	return pathEl;
 };
 
@@ -446,35 +451,157 @@ FacetVertical.prototype._renderSparkline = function(width, height, timeseries, m
  * @private
  */
 FacetVertical.prototype._updateSparkline = function() {
-	if (this._spec.timeseries && this._spec.timeseries.length) {
 
-		this._sparklineContainer.empty();
-		var sparkline = $(facetVertical_sparkline(this._spec));
-		this._sparklineContainer.append(sparkline);
+	if (!this._spec.timeseries && !this._spec.multipleTimeseries) {
+		return;
+	}
 
-		var sparkWidth = this._sparklineContainer.width();
-		var sparkHeight = this._sparklineContainer.height()-2;
+	this._sparklineSVG.empty();
 
-		// Compute the maximum value so total and selected sparklines are the same height
-		var maxValue = 0;
-		this._spec.timeseries.forEach(function(entry) {
-			var y;
-			if (Array.isArray(entry)) {
-				y = entry[TIMESERIES_Y_INDEX];
+	this._sparkWidth = this._sparklineSVG.width();
+	this._sparkHeight = this._sparklineSVG.height() - 2;
+
+	this._minX = Infinity;
+	this._maxX = -Infinity;
+	this._minY = Infinity;
+	this._maxY = -Infinity;
+	this._sparklineLength = 0;
+
+	// backwards compatibility
+	var sparkline = this._spec.timeseries || this._spec.multipleTimeseries;
+
+	this._sparkline = sparkline;
+	this._hasMultipleSparklines = !!this._spec.multipleTimeseries;
+
+	var that = this;
+	var x, y,  i;
+
+	if (this._hasMultipleSparklines) {
+		// muiltiple sparkline
+
+		var exists = {};
+		this._sparkline.forEach(function(subseries) {
+
+			var point;
+			if (subseries.length > 0 && Array.isArray(subseries[0])) {
+
+				for (i=0; i<subseries.length; i++) {
+
+					x = subseries[i][TIMESERIES_X_INDEX];
+					y = subseries[i][TIMESERIES_Y_INDEX];
+
+					that._minX = Math.min(that._minX, x);
+					that._maxX = Math.max(that._maxX, x);
+					that._minY = Math.min(that._minY, y);
+					that._maxY = Math.max(that._maxY, y);
+
+					if (!exists[x]) {
+						point = {
+							x: x,
+							y: [ y ],
+							highlighted: false,
+							metadata: null
+						};
+						exists[x] = point;
+					} else {
+						exists[x].y.push(y);
+					}
+
+				}
+
 			} else {
-				y = entry;
+
+				this._minX = 0;
+				this._maxX = Math.max(this._maxX, subseries.length - 1);
+
+				for (i=0; i<subseries.length; i++) {
+					that._minY = Math.min(that._minY, subseries[i]);
+					that._maxY = Math.max(that._maxY, subseries[i]);
+
+					if (!exists[i]) {
+						point = {
+							x: i,
+							y: [ subseries[i] ],
+							highlighted: false,
+							metadata: null
+						};
+						exists[i] = point;
+					} else {
+						exists[i].y.push(subseries[i]);
+					}
+				}
 			}
-			maxValue = Math.max(maxValue, y);
+			that._sparklineLength = Math.max(that._sparklineLength, subseries.length);
 		});
-		maxValue = maxValue ? maxValue : 1;	// prevent divide by 0
 
-		var totalSparklinePath = this._renderSparkline(sparkWidth,sparkHeight,this._spec.timeseries, maxValue);
-		totalSparklinePath.appendTo(sparkline);
 
-		// If we have a selection, add it to the svg, otherwise, override the styling if provided
+	} else {
+		// single sparkline
+
+		if (sparkline.length > 0 && Array.isArray(sparkline[0])) {
+
+			for (i=0; i<sparkline.length; i++) {
+				x = sparkline[i][TIMESERIES_X_INDEX];
+				y = sparkline[i][TIMESERIES_Y_INDEX];
+				that._minX = Math.min(that._minX, x);
+				that._maxX = Math.max(that._maxX, x);
+				that._minY = Math.min(that._minY, y);
+				that._maxY = Math.max(that._maxY, y);
+			}
+
+		} else {
+
+			this._minX = 0;
+			this._maxX = sparkline.length - 1;
+			for (i=0; i<sparkline.length; i++) {
+				this._minY = Math.min(this._minY, sparkline[i]);
+				this._maxY = Math.max(this._maxY, sparkline[i]);
+			}
+
+		}
+		this._sparklineLength = sparkline.length;
+	}
+
+	this._lineWidth = this._sparkWidth / this._sparklineLength;
+
+	this._totalWidth = this._sparkWidth;
+
+	//
+
+	if (this._hasMultipleSparklines) {
+		// muiltiple sparkline
+
+		this._sparkline.forEach(function(subseries, index) {
+			var totalSparklinePath = that._renderSparkline(that._sparkWidth, that._sparkHeight, subseries, that._maxY, index);
+			totalSparklinePath.appendTo(that._sparklineSVG);
+
+			if (that._spec.selected && that._spec.selected.timeseries) {
+				totalSparklinePath[0].classList.add('facet-sparkline-total');
+			} else {
+				totalSparklinePath.css('stroke', that._colors[index % that._colors.length]);
+			}
+		});
+
 		if (this._spec.selected && this._spec.selected.timeseries) {
-			var selectedSparklinePath = this._renderSparkline(sparkWidth,sparkHeight,this._spec.selected.timeseries, maxValue);
-			selectedSparklinePath.appendTo(sparkline);
+			var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._spec.selected.timeseries, this._maxY, 0);
+			selectedSparklinePath.appendTo(this._sparklineSVG);
+
+			selectedSparklinePath[0].classList.add('facet-sparkline-selected');
+
+			if (this._spec.isQuery && this._spec.icon && this._spec.icon.color) {
+				selectedSparklinePath.css('stroke', this._spec.icon.color);
+			}
+		}
+
+	} else {
+		// single sparkline
+
+		var totalSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._sparkline, this._maxY, 0);
+		totalSparklinePath.appendTo(this._sparklineSVG);
+
+		if (this._spec.selected && this._spec.selected.timeseries) {
+			var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._spec.selected.timeseries, this._maxY, 0);
+			selectedSparklinePath.appendTo(this._sparklineSVG);
 
 			totalSparklinePath[0].classList.add('facet-sparkline-total');
 			selectedSparklinePath[0].classList.add('facet-sparkline-selected');
@@ -482,13 +609,14 @@ FacetVertical.prototype._updateSparkline = function() {
 			if (this._spec.isQuery && this._spec.icon && this._spec.icon.color) {
 				selectedSparklinePath.css('stroke', this._spec.icon.color);
 			}
-
 		} else {
-			if (this._spec.icon && this._spec.icon.color) {
-				totalSparklinePath.css('stroke',this._spec.icon.color);
-			}
+
+			totalSparklinePath.css('stroke', this._colors[0]);
 		}
 	}
+
+
+
 };
 
 /**
