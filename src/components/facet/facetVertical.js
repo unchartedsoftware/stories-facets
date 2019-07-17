@@ -401,8 +401,6 @@ FacetVertical.prototype._removeHandlers = function() {
  */
 FacetVertical.prototype._renderSparkline = function(width, height, sparkline, maxValue, index) {
 
-	console.log(width, height, sparkline, maxValue, index);
-
 	var x = 0, y = 0;
 	var i;
 	var pathData = 'M ';
@@ -443,8 +441,6 @@ FacetVertical.prototype._renderSparkline = function(width, height, sparkline, ma
 
 	var pathEl = $(document.createElementNS('http://www.w3.org/2000/svg', 'path'));
 	pathEl.attr('d', pathData);
-	pathEl.css('stroke', this._colors[index % this._colors.length]);
-	pathEl.css('opacity', 0.5);
 	return pathEl;
 };
 
@@ -461,8 +457,6 @@ FacetVertical.prototype._updateSparkline = function() {
 	}
 
 	this._sparklineSVG.empty();
-
-	console.log('updating');
 
 	this._sparkWidth = this._sparklineSVG.width();
 	this._sparkHeight = this._sparklineSVG.height() - 2;
@@ -581,20 +575,29 @@ FacetVertical.prototype._updateSparkline = function() {
 			var totalSparklinePath = that._renderSparkline(that._sparkWidth, that._sparkHeight, subseries, that._maxY, index);
 			totalSparklinePath.appendTo(that._sparklineSVG);
 
-			if (that._selected) {
+			if (that._spec.selected && that._spec.selected.timeseries) {
 				totalSparklinePath[0].classList.add('facet-sparkline-total');
+			} else {
+				totalSparklinePath.css('stroke', that._colors[index % that._colors.length]);
 			}
 		});
+
+		if (this._spec.selected && this._spec.selected.timeseries) {
+			var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._spec.selected.timeseries, this._maxY, 0);
+			selectedSparklinePath.appendTo(this._sparklineSVG);
+
+			selectedSparklinePath[0].classList.add('facet-sparkline-selected');
+
+			if (this._spec.isQuery && this._spec.icon && this._spec.icon.color) {
+				selectedSparklinePath.css('stroke', this._spec.icon.color);
+			}
+		}
 
 	} else {
 		// single sparkline
 
 		var totalSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._sparkline, this._maxY, 0);
 		totalSparklinePath.appendTo(this._sparklineSVG);
-
-		if (this._selected) {
-			totalSparklinePath[0].classList.add('facet-sparkline-total');
-		}
 
 		if (this._spec.selected && this._spec.selected.timeseries) {
 			var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._spec.selected.timeseries, this._maxY, 0);
@@ -606,6 +609,9 @@ FacetVertical.prototype._updateSparkline = function() {
 			if (this._spec.isQuery && this._spec.icon && this._spec.icon.color) {
 				selectedSparklinePath.css('stroke', this._spec.icon.color);
 			}
+		} else {
+
+			totalSparklinePath.css('stroke', this._colors[0]);
 		}
 	}
 
