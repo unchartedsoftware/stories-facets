@@ -51,7 +51,8 @@ function FacetVertical (container, parentGroup, spec) {
 	this._count = spec.count;
 	this._type = this._spec.isQuery ? 'query' : 'facet';
 	this._hasEmittedSelectedEvent = false;
-	this._colors = spec.colors ? spec.colors : [ '#000' ];
+
+	this._colors = spec.colors ? spec.colors : (this._spec.icon.color ? [ this._spec.icon.color ] : [ '#000' ]);
 
 	if (this._spec.isQuery && this._key != '*') {
 		this._spec.displayValue = this._key + ':' + (this._spec.label ? this._spec.label : this._spec.value);
@@ -594,14 +595,22 @@ FacetVertical.prototype._updateSparkline = function() {
 		if (this._selected) {
 			totalSparklinePath[0].classList.add('facet-sparkline-total');
 		}
+
+		if (this._spec.selected && this._spec.selected.timeseries) {
+			var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._spec.selected.timeseries, this._maxY, 0);
+			selectedSparklinePath.appendTo(this._sparklineSVG);
+
+			totalSparklinePath[0].classList.add('facet-sparkline-total');
+			selectedSparklinePath[0].classList.add('facet-sparkline-selected');
+
+			if (this._spec.isQuery && this._spec.icon && this._spec.icon.color) {
+				selectedSparklinePath.css('stroke', this._spec.icon.color);
+			}
+		}
 	}
 
-	// if (this._selected) {
-	// 	var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._selected, this._maxY);
-	// 	selectedSparklinePath.appendTo(this._sparklineSVG);
-	//
-	// 	selectedSparklinePath[0].classList.add('facet-sparkline-selected');
-	// }
+
+
 };
 
 /**
