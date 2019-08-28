@@ -399,7 +399,7 @@ FacetVertical.prototype._removeHandlers = function() {
  * @method _renderSparkline
  * @private
  */
-FacetVertical.prototype._renderSparkline = function(width, height, sparkline, maxValue, index) {
+FacetVertical.prototype._renderSparkline = function(width, height, sparkline, minXValue, maxXValue, maxYValue, index) {
 
 	var x = 0, y = 0;
 	var i;
@@ -407,30 +407,22 @@ FacetVertical.prototype._renderSparkline = function(width, height, sparkline, ma
 
 	if (sparkline.length > 0 && Array.isArray(sparkline[0])) {
 		// each entry is two values, x and y
-
-		var first = sparkline[0];
-		var last = sparkline[sparkline.length - 1];
-		var xrange = last[TIMESERIES_X_INDEX] - first[TIMESERIES_X_INDEX];
-
-		var lastEntry;
+		var xrange = maxXValue - minXValue;
 		for (i = 0; i < sparkline.length; i++) {
 			var entry = sparkline[i];
-			if (lastEntry) {
-				x += width * ((entry[TIMESERIES_X_INDEX] - lastEntry[TIMESERIES_X_INDEX]) / xrange);
-			}
-			y = height - Math.floor((entry[TIMESERIES_Y_INDEX])/maxValue * height) + 1;
+			x = width * ((entry[TIMESERIES_X_INDEX] - minXValue) / xrange);
+			y = height - Math.floor((entry[TIMESERIES_Y_INDEX])/maxYValue * height) + 1;
 			pathData += (x + ' ' + y);
 			if (i < sparkline.length-1) {
 				pathData += ' L ';
 			}
-			lastEntry = entry;
 		}
 	} else {
 		// each entry is one value, y
-		var dx = width / (sparkline.length-1);
+		var dx = width / (maxXValue);
 
 		for (i = 0; i < sparkline.length; i++) {
-			y = height - Math.floor((sparkline[i])/maxValue * height) + 1;
+			y = height - Math.floor((sparkline[i])/maxYValue * height) + 1;
 			pathData += (x + ' ' + y);
 			if (i < sparkline.length-1) {
 				pathData += ' L ';
@@ -511,8 +503,8 @@ FacetVertical.prototype._updateSparkline = function() {
 
 			} else {
 
-				this._minX = 0;
-				this._maxX = Math.max(this._maxX, subseries.length - 1);
+				that._minX = 0;
+				that._maxX = Math.max(that._maxX, subseries.length - 1);
 
 				for (i=0; i<subseries.length; i++) {
 					that._minY = Math.min(that._minY, subseries[i]);
@@ -572,7 +564,7 @@ FacetVertical.prototype._updateSparkline = function() {
 		// muiltiple sparkline
 
 		this._sparkline.forEach(function(subseries, index) {
-			var totalSparklinePath = that._renderSparkline(that._sparkWidth, that._sparkHeight, subseries, that._maxY, index);
+			var totalSparklinePath = that._renderSparkline(that._sparkWidth, that._sparkHeight, subseries, that._minX, that._maxX, that._maxY, index);
 			totalSparklinePath.appendTo(that._sparklineSVG);
 
 			if (that._spec.selected && that._spec.selected.timeseries) {
@@ -583,7 +575,7 @@ FacetVertical.prototype._updateSparkline = function() {
 		});
 
 		if (this._spec.selected && this._spec.selected.timeseries) {
-			var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._spec.selected.timeseries, this._maxY, 0);
+			var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._spec.selected.timeseries, this._minX, this._maxX, this._maxY, 0);
 			selectedSparklinePath.appendTo(this._sparklineSVG);
 
 			selectedSparklinePath[0].classList.add('facet-sparkline-selected');
@@ -596,11 +588,11 @@ FacetVertical.prototype._updateSparkline = function() {
 	} else {
 		// single sparkline
 
-		var totalSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._sparkline, this._maxY, 0);
+		var totalSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._sparkline, this._minX, this._maxX, this._maxY, 0);
 		totalSparklinePath.appendTo(this._sparklineSVG);
 
 		if (this._spec.selected && this._spec.selected.timeseries) {
-			var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._spec.selected.timeseries, this._maxY, 0);
+			var selectedSparklinePath = this._renderSparkline(this._sparkWidth, this._sparkHeight, this._spec.selected.timeseries, this._minX, this._maxX, this._maxY, 0);
 			selectedSparklinePath.appendTo(this._sparklineSVG);
 
 			totalSparklinePath[0].classList.add('facet-sparkline-total');
