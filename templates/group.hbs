@@ -9,7 +9,13 @@
 			{{{label}}}
 		</div>
 		<div class="group-facet-container-outer">
-			<div class="group-facet-container"></div>
+			{{#ifCond total '===' 0}}
+				<div class="group-facet-placeholder-container">
+					{{{groupPlaceholder}}}
+				</div>
+			{{/ifCond}}
+			<div class="group-facet-container">
+			</div>
 			<div class="group-more-container"></div>
 			<div class="group-less-container"></div>
 		</div>
