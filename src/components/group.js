@@ -66,7 +66,16 @@ function Group(widget, container, groupSpec, options, index) {
 		all: []
 	};
 
-	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, groupSpec.moreTotal, groupSpec.less || 0);
+	this._initializeLayout(
+		Template,
+		groupSpec.label,
+		groupSpec.more || 0,
+		groupSpec.moreTotal,
+		groupSpec.less || 0,
+		groupSpec.facets ? groupSpec.facets.length : 0,
+		groupSpec.groupPlaceholder,
+		index
+	);
 	this._initializeFacets(groupSpec);
 	/* collapsed state */
 	if (groupSpec.collapsed) {
@@ -378,7 +387,16 @@ Group.prototype.replace = function(groupSpec) {
 	this._collapsible = groupSpec.collapsible !== undefined ? groupSpec.collapsible : true;
 
 	//reinit
-	this._initializeLayout(Template, groupSpec.label, groupSpec.more || 0, groupSpec.moreTotal, groupSpec.less || 0, index);
+	this._initializeLayout(
+		Template,
+		groupSpec.label,
+		groupSpec.more || 0,
+		groupSpec.moreTotal,
+		groupSpec.less || 0,
+		groupSpec.facets ? groupSpec.facets.length : 0,
+		groupSpec.groupPlaceholder,
+		index
+	);
 
 	// initialize the new facets
 	this._initializeFacets(groupSpec);
@@ -477,14 +495,18 @@ Group.prototype._destroyFacets = function () {
  * @param {*} more - A value defining the 'more' behaviour of this group.
  * @param {*} moreTotal - A value defining total count of the 'more' behaviour of this group.
  * @param {*} less - A value defining the 'less' behaviour of this group.
+ * @param {int} total - total num of facets
+ * @param {string} groupPlaceholder - A placeholder to show when group does not contain any facets
  * @param {number} index - The index of the element to insert at.
  * @private
  */
-Group.prototype._initializeLayout = function (template, label, more, moreTotal, less, index) {
+Group.prototype._initializeLayout = function (template, label, more, moreTotal, less, total, groupPlaceholder, index) {
 	this._element = $(template({
 		label: label,
 		more: more,
-		collapsible: this._collapsible
+		collapsible: this._collapsible,
+		total: total,
+		groupPlaceholder: groupPlaceholder
 	}));
 	if (index === undefined) {
 		// if no index is specified, append to container
