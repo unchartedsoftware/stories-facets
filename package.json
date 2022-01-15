@@ -45,7 +45,7 @@
     "proxyquireify": "^3.0.1",
     "run-sequence": "2.2.1",
     "serve-favicon": "~2.5.0",
-    "shelljs": "^0.6.0",
+    "shelljs": "^0.8.5",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
     "vinyl-buffer": "1.0.1",
