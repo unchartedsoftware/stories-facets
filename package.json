@@ -27,7 +27,7 @@
     "handlebars": "4.1.0",
     "hbs": "~4.0.3",
     "jshint": "^2.10.1",
-    "karma": "^4.0.1",
+    "karma": "^6.4.1",
     "karma-browserify": "^5.0.0",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^0.2.2",
