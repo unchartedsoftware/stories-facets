@@ -38,7 +38,7 @@
     "karma-sinon-chai": "^1.1.0",
     "karma-tamtam-bamboo-reporter": "^1.0.1",
     "lolex": "^1.4.0",
-    "mocha": "^6.0.2",
+    "mocha": "^10.2.0",
     "morgan": "~1.9.1",
     "phantom-ownpropertynames": "^1.0.0",
     "phantomjs-prebuilt": "^2.1.7",
